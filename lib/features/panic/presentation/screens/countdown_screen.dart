@@ -1,11 +1,13 @@
 /// Countdown screen shown during panic countdown.
+library;
+
 ///
 /// Shows timer, progress bar, and cancel option.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:my_panic/core/theme/app_theme.dart';
-import 'package:my_panic/features/panic/domain/panic_state.dart';
+
 import 'package:my_panic/features/panic/presentation/providers/panic_notifier.dart';
 
 /// Countdown screen with timer and cancel option.
@@ -41,7 +43,7 @@ class CountdownScreen extends ConsumerWidget {
                       vertical: 8,
                     ),
                     decoration: BoxDecoration(
-                      color: AppTheme.warningYellow.withOpacity(0.2),
+                      color: AppTheme.warningYellow.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: const Row(
@@ -87,7 +89,7 @@ class CountdownScreen extends ConsumerWidget {
                             strokeWidth: 8,
                             backgroundColor: Colors.transparent,
                             valueColor: AlwaysStoppedAnimation<Color>(
-                              AppTheme.errorRed.withOpacity(0.2),
+                              AppTheme.errorRed.withValues(alpha: 0.2),
                             ),
                           ),
                         ),
@@ -139,7 +141,7 @@ class CountdownScreen extends ConsumerWidget {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 14,
-                          color: AppTheme.textSecondary.withOpacity(0.8),
+                          color: AppTheme.textSecondary.withValues(alpha: 0.8),
                         ),
                       ),
                     ),
@@ -188,7 +190,7 @@ class _SlideToCancelState extends State<_SlideToCancel> {
         color: AppTheme.cardDark,
         borderRadius: BorderRadius.circular(32),
         border: Border.all(
-          color: AppTheme.errorRed.withOpacity(0.3),
+          color: AppTheme.errorRed.withValues(alpha: 0.3),
           width: 2,
         ),
       ),
@@ -204,12 +206,12 @@ class _SlideToCancelState extends State<_SlideToCancel> {
                   Icon(
                     Icons.arrow_forward_ios,
                     size: 14,
-                    color: AppTheme.textMuted.withOpacity(0.5),
+                    color: AppTheme.textMuted.withValues(alpha: 0.5),
                   ),
                   Icon(
                     Icons.arrow_forward_ios,
                     size: 14,
-                    color: AppTheme.textMuted.withOpacity(0.5),
+                    color: AppTheme.textMuted.withValues(alpha: 0.5),
                   ),
                   const SizedBox(width: 8),
                   Text(
@@ -217,7 +219,7 @@ class _SlideToCancelState extends State<_SlideToCancel> {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: AppTheme.textMuted.withOpacity(0.7),
+                      color: AppTheme.textMuted.withValues(alpha: 0.7),
                       letterSpacing: 2,
                     ),
                   ),
@@ -225,12 +227,12 @@ class _SlideToCancelState extends State<_SlideToCancel> {
                   Icon(
                     Icons.arrow_forward_ios,
                     size: 14,
-                    color: AppTheme.textMuted.withOpacity(0.5),
+                    color: AppTheme.textMuted.withValues(alpha: 0.5),
                   ),
                   Icon(
                     Icons.arrow_forward_ios,
                     size: 14,
-                    color: AppTheme.textMuted.withOpacity(0.5),
+                    color: AppTheme.textMuted.withValues(alpha: 0.5),
                   ),
                 ],
               ),
@@ -271,7 +273,7 @@ class _SlideToCancelState extends State<_SlideToCancel> {
                   border: Border.all(
                     color: _confirmed
                         ? AppTheme.successGreen
-                        : AppTheme.errorRed.withOpacity(0.5),
+                        : AppTheme.errorRed.withValues(alpha: 0.5),
                     width: 2,
                   ),
                 ),

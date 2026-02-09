@@ -4,6 +4,8 @@
 
 import 'dart:developer' as developer;
 import 'package:geolocator/geolocator.dart';
+import 'package:flutter_sms/flutter_sms.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:my_panic/features/panic/domain/entities/emergency_contact.dart';
 import 'package:my_panic/features/panic/domain/entities/medical_profile.dart';
 import 'package:my_panic/features/panic/domain/entities/alert_status.dart';
@@ -56,38 +58,50 @@ class PanicRepository {
 
   /// Sends SMS to emergency contacts.
   ///
-  /// In MVP, this logs the action. In production, this would use flutter_sms
-  /// or platform-specific SMS intents.
+  /// Uses flutter_sms to send messages. Fallback to url_launcher for direct
+  /// intents if needed.
   Future<bool> sendSmsToContacts({
     required List<EmergencyContact> contacts,
     required Position location,
   }) async {
-    final message = '''
-EMERGENCY ALERT!
-I need help! This is an automated emergency message.
-My location: https://maps.google.com/?q=${location.latitude},${location.longitude}
-Please contact local emergency services if needed.
-''';
+    final message =
+        'EMERGENCY ALERT! I need help! My location: https://maps.google.com/?q=${location.latitude},${location.longitude}';
 
-    for (final contact in contacts) {
+    final recipients = contacts.map((c) => c.phone).toList();
+
+    try {
+      // Try using flutter_sms
+      // On some devices/platforms this might fail or open a dialog
+      await sendSMS(
+        message: message,
+        recipients: recipients,
+        sendDirect: false,
+      ).catchError((onError) {
+        developer.log('Flutter SMS failed: $onError', name: 'PanicRepository');
+        throw onError; // Rethrow to trigger fallback
+      });
+      return true;
+    } catch (e) {
       developer.log(
-        'SMS SENT (SIMULATED)',
+        'Falling back to generic SMS intent',
         name: 'PanicRepository',
-        error: {
-          'to': contact.phone,
-          'name': contact.name,
-          'message': message,
-        },
       );
+      // Fallback: Try opening SMS app with details
+      // This usually only supports one recipient or specific format depending on platform
+      // We'll try the first contact as a fallback
+      if (contacts.isNotEmpty) {
+        final uri = Uri(
+          scheme: 'sms',
+          path: contacts.first.phone,
+          queryParameters: {'body': message},
+        );
+        if (await canLaunchUrl(uri)) {
+          await launchUrl(uri);
+          return true;
+        }
+      }
+      return false;
     }
-
-    // TODO: In production, use flutter_sms or platform intents:
-    // await sendSMS(
-    //   message: message,
-    //   recipients: contacts.map((c) => c.phone).toList(),
-    // );
-
-    return true;
   }
 
   /// Cancels an active alert.

@@ -1,4 +1,6 @@
 /// Riverpod providers for the panic feature.
+library;
+
 ///
 /// Exposes the trigger service, panic notifier, and related dependencies.
 
@@ -10,9 +12,10 @@ import 'package:my_panic/core/services/location_service.dart';
 import 'package:my_panic/features/panic/data/panic_repository.dart';
 import 'package:my_panic/features/panic/domain/panic_state.dart';
 import 'package:my_panic/features/panic/domain/entities/emergency_contact.dart';
-import 'package:my_panic/features/panic/domain/entities/medical_profile.dart';
+
 import 'package:my_panic/features/trigger_engine/abstract_trigger_source.dart';
 import 'package:my_panic/features/trigger_engine/manual_trigger_source.dart';
+import 'package:my_panic/features/user_profile/presentation/providers/medical_profile_provider.dart';
 
 part 'panic_notifier.g.dart';
 
@@ -163,8 +166,8 @@ class PanicNotifier extends _$PanicNotifier {
       // Get emergency contacts (dummy for MVP)
       final contacts = _getDummyContacts();
 
-      // Get medical profile (empty for MVP)
-      const profile = MedicalProfile();
+      // Get medical profile
+      final profile = ref.read(medicalProfileProvider);
 
       // Send SMS to contacts
       await panicRepository.sendSmsToContacts(

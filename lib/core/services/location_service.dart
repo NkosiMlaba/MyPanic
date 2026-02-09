@@ -1,4 +1,6 @@
 /// Location service for getting user's position.
+library;
+
 ///
 /// Uses geolocator package for GPS location.
 
@@ -39,7 +41,9 @@ class LocationService {
     }
 
     // Get position with high accuracy for emergency situations
-    // ignore: deprecated_member_use - using deprecated API for web compatibility
+    // Get position with high accuracy for emergency situations
+    // Get position with high accuracy for emergency situations
+    // ignore: deprecated_member_use
     return await Geolocator.getCurrentPosition(
       desiredAccuracy: LocationAccuracy.high,
     );

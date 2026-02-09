@@ -55,6 +55,10 @@ dependencies:
   # Permission Handler
   permission_handler: ^11.3.0
 
+  # SMS and Calling
+  flutter_sms: ^2.3.3
+  url_launcher: ^6.2.4
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

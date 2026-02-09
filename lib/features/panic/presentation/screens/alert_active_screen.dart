@@ -1,4 +1,6 @@
 /// Alert active screen (stealth mode).
+library;
+
 ///
 /// Shown when the emergency alert has been sent.
 /// Dark/minimal design for discretion.
@@ -7,6 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:my_panic/core/theme/app_theme.dart';
 import 'package:my_panic/features/panic/presentation/providers/panic_notifier.dart';
+import 'package:my_panic/features/user_profile/presentation/providers/medical_profile_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// Alert active screen with "Help is on the way" message.
 class AlertActiveScreen extends ConsumerWidget {
@@ -69,7 +73,7 @@ class AlertActiveScreen extends ConsumerWidget {
                         vertical: 8,
                       ),
                       decoration: BoxDecoration(
-                        color: AppTheme.successGreen.withOpacity(0.15),
+                        color: AppTheme.successGreen.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: const Row(
@@ -94,17 +98,90 @@ class AlertActiveScreen extends ConsumerWidget {
 
                     const SizedBox(height: 48),
 
-                    // Emergency contacts list (minimal)
+                    // Medical Info
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 48),
-                      child: Column(
-                        children: [
-                          _buildContactRow('Mom', 'Notified'),
-                          _buildContactRow('Dad', 'Notified'),
-                          _buildContactRow('Campus Security', 'Notified'),
-                          _buildContactRow('Best Friend', 'Notified'),
-                          _buildContactRow('Resident Advisor', 'Notified'),
-                        ],
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 16,
+                      ),
+                      child: Consumer(
+                        builder: (context, ref, child) {
+                          final profile = ref.watch(medicalProfileProvider);
+                          return Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: AppTheme.cardDark,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: AppTheme.errorRed.withValues(alpha: 0.3),
+                              ),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'MEDICAL INFO (Show to EMS)',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppTheme.errorRed,
+                                    letterSpacing: 1,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    _buildInfoItem(
+                                      'Blood Type',
+                                      profile.bloodType ?? 'Unknown',
+                                    ),
+                                    _buildInfoItem(
+                                      'Allergies',
+                                      profile.allergies.isNotEmpty
+                                          ? profile.allergies.join(', ')
+                                          : 'None',
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                _buildInfoItem(
+                                  'Conditions',
+                                  profile.conditions.isNotEmpty
+                                      ? profile.conditions.join(', ')
+                                      : 'None',
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Emergency contacts list (minimal)
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 32),
+                          child: Column(
+                            children: [
+                              _buildContactRow('Mom', '+27123456789'),
+                              _buildContactRow('Dad', '+27123456780'),
+                              _buildContactRow(
+                                'Campus Security',
+                                '+27123456781',
+                              ),
+                              _buildContactRow('Best Friend', '+27123456782'),
+                              _buildContactRow(
+                                'Resident Advisor',
+                                '+27123456783',
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
                   ],
@@ -119,7 +196,7 @@ class AlertActiveScreen extends ConsumerWidget {
                 'Stay safe. Help has been alerted.',
                 style: TextStyle(
                   fontSize: 12,
-                  color: AppTheme.textMuted.withOpacity(0.5),
+                  color: AppTheme.textMuted.withValues(alpha: 0.5),
                 ),
               ),
             ),
@@ -129,25 +206,80 @@ class AlertActiveScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildContactRow(String name, String status) {
+  Widget _buildInfoItem(String label, String value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 11,
+            color: AppTheme.textSecondary.withValues(alpha: 0.7),
+          ),
+        ),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: AppTheme.textPrimary,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildContactRow(String name, String phone) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            name,
-            style: TextStyle(
-              fontSize: 14,
-              color: AppTheme.textSecondary.withOpacity(0.7),
-            ),
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppTheme.surfaceDark,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.person,
+                  size: 16,
+                  color: AppTheme.textSecondary,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    name,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: AppTheme.textPrimary,
+                    ),
+                  ),
+                  Text(
+                    'Notified',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppTheme.successGreen.withValues(alpha: 0.7),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
-          Text(
-            status,
-            style: TextStyle(
-              fontSize: 12,
-              color: AppTheme.successGreen.withOpacity(0.7),
-            ),
+          IconButton(
+            icon: const Icon(Icons.call, color: AppTheme.successGreen),
+            onPressed: () async {
+              final uri = Uri(scheme: 'tel', path: phone);
+              if (await canLaunchUrl(uri)) {
+                await launchUrl(uri);
+              }
+            },
           ),
         ],
       ),
@@ -207,9 +339,10 @@ class _PulsingIconState extends State<_PulsingIcon>
       vsync: this,
     )..repeat(reverse: true);
 
-    _animation = Tween<double>(begin: 0.8, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _animation = Tween<double>(
+      begin: 0.8,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -229,7 +362,7 @@ class _PulsingIconState extends State<_PulsingIcon>
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: AppTheme.successGreen.withOpacity(0.1),
+              color: AppTheme.successGreen.withValues(alpha: 0.1),
             ),
             child: const Icon(
               Icons.shield_outlined,

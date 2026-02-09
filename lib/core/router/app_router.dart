@@ -1,12 +1,13 @@
 /// GoRouter configuration for app navigation.
+library;
+
 ///
 /// Handles routing between panic states and screens.
 
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:my_panic/features/panic/domain/panic_state.dart';
+
 import 'package:my_panic/features/panic/presentation/providers/panic_notifier.dart';
 import 'package:my_panic/features/panic/presentation/screens/home_screen.dart';
 import 'package:my_panic/features/panic/presentation/screens/countdown_screen.dart';
@@ -42,14 +43,14 @@ GoRouter goRouter(Ref ref) {
           }
           return null;
         },
-        countingDown: (_, __) {
+        countingDown: (_, _) {
           // Navigate to countdown screen
           if (currentPath != AppRoutes.countdown) {
             return AppRoutes.countdown;
           }
           return null;
         },
-        active: (_, __) {
+        active: (_, _) {
           // Navigate to alert active screen
           if (currentPath != AppRoutes.alertActive) {
             return AppRoutes.alertActive;
@@ -64,7 +65,7 @@ GoRouter goRouter(Ref ref) {
           }
           return null;
         },
-        error: (_, __) => null,
+        error: (_, _) => null,
       );
     },
     routes: [

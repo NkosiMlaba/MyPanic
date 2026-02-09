@@ -1,4 +1,6 @@
 /// MYPanic - Student Safety App
+library;
+
 ///
 /// MVP Phase 1: Manual Panic Button
 
@@ -27,11 +29,7 @@ void main() {
     ),
   );
 
-  runApp(
-    const ProviderScope(
-      child: MyPanicApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: MyPanicApp()));
 }
 
 /// Main application widget.
