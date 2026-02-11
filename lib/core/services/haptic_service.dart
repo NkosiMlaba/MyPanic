@@ -14,7 +14,7 @@ class HapticService {
   ///
   /// Pattern: vibrate 500ms, pause 500ms, repeat
   Future<void> startPanicVibration() async {
-    final hasVibrator = await Vibration.hasVibrator() ?? false;
+    final hasVibrator = await Vibration.hasVibrator();
     if (!hasVibrator) return;
 
     _isVibrating = true;
@@ -39,7 +39,7 @@ class HapticService {
 
   /// Quick haptic tap feedback.
   Future<void> tapFeedback() async {
-    final hasVibrator = await Vibration.hasVibrator() ?? false;
+    final hasVibrator = await Vibration.hasVibrator();
     if (!hasVibrator) return;
 
     await Vibration.vibrate(duration: 50);
@@ -47,7 +47,7 @@ class HapticService {
 
   /// Strong haptic feedback for button press.
   Future<void> buttonPressFeedback() async {
-    final hasVibrator = await Vibration.hasVibrator() ?? false;
+    final hasVibrator = await Vibration.hasVibrator();
     if (!hasVibrator) return;
 
     await Vibration.vibrate(duration: 100);
@@ -55,7 +55,7 @@ class HapticService {
 
   /// Emergency alert vibration pattern.
   Future<void> emergencyAlertFeedback() async {
-    final hasVibrator = await Vibration.hasVibrator() ?? false;
+    final hasVibrator = await Vibration.hasVibrator();
     if (!hasVibrator) return;
 
     // SOS pattern in haptic: 3 short, 3 long, 3 short

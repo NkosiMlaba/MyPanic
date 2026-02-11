@@ -6,8 +6,8 @@ library;
 
 import 'dart:developer' as developer;
 import 'package:geolocator/geolocator.dart';
-import 'package:flutter_sms/flutter_sms.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'dart:io' show Platform;
 import 'package:my_panic/features/panic/domain/entities/emergency_contact.dart';
 import 'package:my_panic/features/panic/domain/entities/medical_profile.dart';
 import 'package:my_panic/features/panic/domain/entities/alert_status.dart';
@@ -69,39 +69,34 @@ class PanicRepository {
     final message =
         'EMERGENCY ALERT! I need help! My location: https://maps.google.com/?q=${location.latitude},${location.longitude}';
 
-    final recipients = contacts.map((c) => c.phone).toList();
+    if (contacts.isEmpty) return false;
+
+    // Create a list of phone numbers
+    final phones = contacts.map((c) => c.phone).toList();
+
+    // Determine separator based on platform
+    // Android uses semicolon ';', iOS uses comma ',' (sometimes) or just one number
+    String separator = ';';
+    if (Platform.isIOS) {
+      separator = ',';
+    }
+
+    final path = phones.join(separator);
+
+    final uri = Uri(
+      scheme: 'sms',
+      path: path,
+      queryParameters: {'body': message},
+    );
 
     try {
-      // Try using flutter_sms
-      // On some devices/platforms this might fail or open a dialog
-      await sendSMS(
-        message: message,
-        recipients: recipients,
-        sendDirect: false,
-      ).catchError((onError) {
-        developer.log('Flutter SMS failed: $onError', name: 'PanicRepository');
-        throw onError; // Rethrow to trigger fallback
-      });
-      return true;
-    } catch (e) {
-      developer.log(
-        'Falling back to generic SMS intent',
-        name: 'PanicRepository',
-      );
-      // Fallback: Try opening SMS app with details
-      // This usually only supports one recipient or specific format depending on platform
-      // We'll try the first contact as a fallback
-      if (contacts.isNotEmpty) {
-        final uri = Uri(
-          scheme: 'sms',
-          path: contacts.first.phone,
-          queryParameters: {'body': message},
-        );
-        if (await canLaunchUrl(uri)) {
-          await launchUrl(uri);
-          return true;
-        }
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri);
+        return true;
       }
+      return false;
+    } catch (e) {
+      developer.log('Error launching SMS: $e', name: 'PanicRepository');
       return false;
     }
   }

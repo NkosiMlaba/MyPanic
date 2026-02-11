@@ -50,13 +50,13 @@ dependencies:
   geolocator: ^11.0.0
 
   # Haptic Feedback / Vibration
-  vibration: ^1.8.4
+  vibration: ^3.1.6
 
   # Permission Handler
   permission_handler: ^11.3.0
 
   # SMS and Calling
-  flutter_sms: ^2.3.3
+  # flutter_sms removed due to Android build issues
   url_launcher: ^6.2.4
 
 dev_dependencies:
