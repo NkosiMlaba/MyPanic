@@ -1,4 +1,6 @@
 /// BLE Panic Trigger Service Placeholder (Phase 2)
+library;
+
 ///
 /// This is a placeholder implementation for Bluetooth Low Energy (BLE)
 /// hardware trigger support. This will be fully implemented in Phase 2.

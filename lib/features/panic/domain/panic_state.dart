@@ -1,4 +1,6 @@
 /// Panic state definitions using Freezed.
+library;
+
 ///
 /// Represents the different states of the panic system.
 
@@ -28,13 +30,10 @@ sealed class PanicState with _$PanicState {
   }) = PanicStateActive;
 
   /// User cancelled during countdown
-  const factory PanicState.cancelled({
-    required DateTime cancelledAt,
-  }) = PanicStateCancelled;
+  const factory PanicState.cancelled({required DateTime cancelledAt}) =
+      PanicStateCancelled;
 
   /// Error occurred during panic process
-  const factory PanicState.error({
-    required String message,
-    Object? exception,
-  }) = PanicStateError;
+  const factory PanicState.error({required String message, Object? exception}) =
+      PanicStateError;
 }

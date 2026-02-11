@@ -1,4 +1,6 @@
 /// Panic repository for backend communication.
+library;
+
 ///
 /// Handles sending emergency alerts to the backend and SMS to contacts.
 

@@ -1,4 +1,6 @@
 /// Emergency contact entity.
+library;
+
 ///
 /// Represents a contact who should be notified during an emergency.
 

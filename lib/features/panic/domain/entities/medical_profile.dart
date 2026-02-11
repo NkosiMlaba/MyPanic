@@ -1,4 +1,6 @@
 /// Medical profile entity.
+library;
+
 ///
 /// Contains medical information to be shared during emergencies.
 

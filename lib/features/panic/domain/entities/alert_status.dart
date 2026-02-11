@@ -1,4 +1,6 @@
 /// Alert status entity.
+library;
+
 ///
 /// Tracks the status of an emergency alert.
 
@@ -25,11 +27,4 @@ class AlertStatus with _$AlertStatus {
 }
 
 /// Possible states of an alert.
-enum AlertState {
-  pending,
-  sending,
-  sent,
-  acknowledged,
-  resolved,
-  failed,
-}
+enum AlertState { pending, sending, sent, acknowledged, resolved, failed }

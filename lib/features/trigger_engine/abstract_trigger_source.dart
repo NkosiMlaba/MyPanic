@@ -1,4 +1,6 @@
 /// Abstract interface for panic trigger sources.
+library;
+
 ///
 /// This is the contract for the Observer Pattern that allows
 /// pluggable trigger sources (manual button, BLE device, etc.)
@@ -14,20 +16,11 @@ class TriggerEvent {
   final TriggerSource source;
   final Map<String, dynamic>? metadata;
 
-  TriggerEvent({
-    required this.timestamp,
-    required this.source,
-    this.metadata,
-  });
+  TriggerEvent({required this.timestamp, required this.source, this.metadata});
 }
 
 /// Identifies the type of trigger source
-enum TriggerSource {
-  manual,
-  ble,
-  voice,
-  gesture,
-}
+enum TriggerSource { manual, ble, voice, gesture }
 
 /// Abstract interface for all panic trigger services.
 ///

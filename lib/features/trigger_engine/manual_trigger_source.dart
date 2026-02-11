@@ -1,4 +1,6 @@
 /// Manual panic trigger implementation.
+library;
+
 ///
 /// This implementation is triggered by UI button press.
 /// It implements [PanicTriggerService] to emit events when

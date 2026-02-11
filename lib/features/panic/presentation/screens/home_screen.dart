@@ -1,4 +1,6 @@
 /// Home screen with panic button.
+library;
+
 ///
 /// Main screen of the app showing the large panic button.
 
@@ -79,7 +81,7 @@ class HomeScreen extends ConsumerWidget {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: AppTheme.successGreen.withOpacity(0.2),
+                        color: AppTheme.successGreen.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Icon(
@@ -117,11 +119,7 @@ class HomeScreen extends ConsumerWidget {
             ),
 
             // Panic Button (centered)
-            const Expanded(
-              child: Center(
-                child: PanicButtonWidget(),
-              ),
-            ),
+            const Expanded(child: Center(child: PanicButtonWidget())),
 
             // Bottom info
             Padding(
@@ -147,7 +145,7 @@ class HomeScreen extends ConsumerWidget {
                     '30 second countdown before alert is sent',
                     style: TextStyle(
                       fontSize: 12,
-                      color: AppTheme.textMuted.withOpacity(0.7),
+                      color: AppTheme.textMuted.withValues(alpha: 0.7),
                     ),
                   ),
                 ],
@@ -163,10 +161,10 @@ class HomeScreen extends ConsumerWidget {
     return state.when(
       idle: () => _statusDot(AppTheme.textMuted, 'Idle'),
       armed: () => _statusDot(AppTheme.successGreen, 'Ready'),
-      countingDown: (_, __) => _statusDot(AppTheme.warningYellow, 'Counting'),
-      active: (_, __) => _statusDot(AppTheme.errorRed, 'Active'),
+      countingDown: (_, _) => _statusDot(AppTheme.warningYellow, 'Counting'),
+      active: (_, _) => _statusDot(AppTheme.errorRed, 'Active'),
       cancelled: (_) => _statusDot(AppTheme.infoBlue, 'Cancelled'),
-      error: (_, __) => _statusDot(AppTheme.errorRed, 'Error'),
+      error: (_, _) => _statusDot(AppTheme.errorRed, 'Error'),
     );
   }
 
@@ -174,7 +172,7 @@ class HomeScreen extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.2),
+        color: color.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
@@ -183,10 +181,7 @@ class HomeScreen extends ConsumerWidget {
           Container(
             width: 8,
             height: 8,
-            decoration: BoxDecoration(
-              color: color,
-              shape: BoxShape.circle,
-            ),
+            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
           ),
           const SizedBox(width: 6),
           Text(
@@ -208,26 +203,16 @@ class HomeScreen extends ConsumerWidget {
       decoration: BoxDecoration(
         color: AppTheme.surfaceDark,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: AppTheme.cardDark,
-          width: 1,
-        ),
+        border: Border.all(color: AppTheme.cardDark, width: 1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            icon,
-            size: 16,
-            color: AppTheme.textSecondary,
-          ),
+          Icon(icon, size: 16, color: AppTheme.textSecondary),
           const SizedBox(width: 6),
           Text(
             label,
-            style: const TextStyle(
-              fontSize: 12,
-              color: AppTheme.textSecondary,
-            ),
+            style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary),
           ),
         ],
       ),

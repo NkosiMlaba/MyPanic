@@ -1,4 +1,6 @@
 /// Core failure classes for error handling.
+library;
+
 ///
 /// Based on Clean Architecture principles, application errors
 /// should be represented as domain-level Failure classes.
@@ -17,10 +19,8 @@ sealed class Failure with _$Failure {
   }) = PermissionFailure;
 
   /// Location service failed
-  const factory Failure.location({
-    required String message,
-    String? errorCode,
-  }) = LocationFailure;
+  const factory Failure.location({required String message, String? errorCode}) =
+      LocationFailure;
 
   /// SMS sending failed
   const factory Failure.sms({
@@ -29,10 +29,8 @@ sealed class Failure with _$Failure {
   }) = SmsFailure;
 
   /// Network/API failure
-  const factory Failure.network({
-    required String message,
-    int? statusCode,
-  }) = NetworkFailure;
+  const factory Failure.network({required String message, int? statusCode}) =
+      NetworkFailure;
 
   /// Generic unexpected failure
   const factory Failure.unexpected({

@@ -1,4 +1,6 @@
 /// App theme configuration.
+library;
+
 ///
 /// Dark theme optimized for emergency use with high contrast.
 

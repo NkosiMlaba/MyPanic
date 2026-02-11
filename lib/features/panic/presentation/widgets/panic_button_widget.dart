@@ -1,4 +1,6 @@
 /// Panic button widget.
+library;
+
 ///
 /// Large, accessible button with pulse animation.
 
@@ -28,13 +30,9 @@ class _PanicButtonWidgetState extends ConsumerState<PanicButtonWidget>
       vsync: this,
     )..repeat(reverse: true);
 
-    _pulseAnimation = Tween<double>(
-      begin: 1.0,
-      end: 1.08,
-    ).animate(CurvedAnimation(
-      parent: _pulseController,
-      curve: Curves.easeInOut,
-    ));
+    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.08).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    );
   }
 
   @override
@@ -58,10 +56,7 @@ class _PanicButtonWidgetState extends ConsumerState<PanicButtonWidget>
     return AnimatedBuilder(
       animation: _pulseAnimation,
       builder: (context, child) {
-        return Transform.scale(
-          scale: _pulseAnimation.value,
-          child: child,
-        );
+        return Transform.scale(scale: _pulseAnimation.value, child: child);
       },
       child: Stack(
         alignment: Alignment.center,
@@ -74,7 +69,7 @@ class _PanicButtonWidgetState extends ConsumerState<PanicButtonWidget>
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: AppTheme.primaryRed.withOpacity(0.3),
+                  color: AppTheme.primaryRed.withValues(alpha: 0.3),
                   blurRadius: 30,
                   spreadRadius: 10,
                 ),
@@ -90,21 +85,18 @@ class _PanicButtonWidgetState extends ConsumerState<PanicButtonWidget>
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: const RadialGradient(
-                  colors: [
-                    AppTheme.primaryRed,
-                    AppTheme.darkRed,
-                  ],
+                  colors: [AppTheme.primaryRed, AppTheme.darkRed],
                   center: Alignment(-0.2, -0.2),
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: AppTheme.darkRed.withOpacity(0.5),
+                    color: AppTheme.darkRed.withValues(alpha: 0.5),
                     blurRadius: 20,
                     offset: const Offset(0, 10),
                   ),
                 ],
                 border: Border.all(
-                  color: AppTheme.primaryRed.withOpacity(0.8),
+                  color: AppTheme.primaryRed.withValues(alpha: 0.8),
                   width: 3,
                 ),
               ),
@@ -112,11 +104,7 @@ class _PanicButtonWidgetState extends ConsumerState<PanicButtonWidget>
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      Icons.warning_rounded,
-                      size: 64,
-                      color: Colors.white,
-                    ),
+                    Icon(Icons.warning_rounded, size: 64, color: Colors.white),
                     SizedBox(height: 8),
                     Text(
                       'PANIC',

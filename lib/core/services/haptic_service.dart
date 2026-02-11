@@ -1,4 +1,6 @@
 /// Haptic feedback service for vibration patterns.
+library;
+
 ///
 /// Provides vibration feedback during panic countdown.
 
@@ -58,7 +60,26 @@ class HapticService {
 
     // SOS pattern in haptic: 3 short, 3 long, 3 short
     await Vibration.vibrate(
-      pattern: [0, 100, 100, 100, 100, 100, 200, 300, 100, 300, 100, 300, 200, 100, 100, 100, 100, 100],
+      pattern: [
+        0,
+        100,
+        100,
+        100,
+        100,
+        100,
+        200,
+        300,
+        100,
+        300,
+        100,
+        300,
+        200,
+        100,
+        100,
+        100,
+        100,
+        100,
+      ],
     );
   }
 
