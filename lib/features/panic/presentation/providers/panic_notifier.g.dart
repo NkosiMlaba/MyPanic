@@ -108,7 +108,7 @@ final panicRepositoryProvider = AutoDisposeProvider<PanicRepository>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef PanicRepositoryRef = AutoDisposeProviderRef<PanicRepository>;
-String _$panicNotifierHash() => r'd2e820bc876ae487f1459138fe4a540298dc076b';
+String _$panicNotifierHash() => r'25ebd720e54f4842982058b1e71c11a0d47eccad';
 
 /// Main panic state notifier.
 /// Listens to trigger events and manages the panic flow.

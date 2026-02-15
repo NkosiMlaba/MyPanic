@@ -7,11 +7,18 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:my_panic/core/theme/app_theme.dart';
 import 'package:my_panic/core/router/app_router.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Firebase
+  // Note: asking user to provide google-services.json, so we use DefaultFirebaseOptions if available,
+  // or fall back to platform default (which uses google-services.json on Android).
+  // For now, valid android setup relies on google-services.json being present.
+  await Firebase.initializeApp();
 
   // Lock to portrait mode for consistent UX
   SystemChrome.setPreferredOrientations([

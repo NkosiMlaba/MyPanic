@@ -58,6 +58,9 @@ dependencies:
   # SMS and Calling
   # flutter_sms removed due to Android build issues
   url_launcher: ^6.2.4
+  firebase_core: ^4.4.0
+  firebase_auth: ^6.1.4
+  cloud_firestore: ^6.1.2
 
 dev_dependencies:
   flutter_test:
