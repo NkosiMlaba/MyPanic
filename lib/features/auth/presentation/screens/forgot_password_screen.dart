@@ -98,8 +98,8 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                     margin: const EdgeInsets.only(bottom: 16),
                     decoration: BoxDecoration(
                       color: _isError
-                          ? AppTheme.primaryRed.withOpacity(0.1)
-                          : Colors.green.withOpacity(0.1),
+                          ? AppTheme.primaryRed.withValues(alpha: 0.1)
+                          : Colors.green.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
                         color: _isError ? AppTheme.primaryRed : Colors.green,

@@ -1,29 +1,27 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'app_router.dart';
+part of 'user_profile_provider.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$goRouterHash() => r'ee7073138bca27434b858a4d16aee1b3466f1b18';
+String _$userProfileHash() => r'6978ae90a91533c885e7ba1c0dbf476e11dfffb0';
 
-/// Provides the GoRouter instance.
-///
-/// Copied from [goRouter].
-@ProviderFor(goRouter)
-final goRouterProvider = AutoDisposeProvider<GoRouter>.internal(
-  goRouter,
-  name: r'goRouterProvider',
+/// See also [userProfile].
+@ProviderFor(userProfile)
+final userProfileProvider = AutoDisposeStreamProvider<UserProfile?>.internal(
+  userProfile,
+  name: r'userProfileProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$goRouterHash,
+      : _$userProfileHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef GoRouterRef = AutoDisposeProviderRef<GoRouter>;
+typedef UserProfileRef = AutoDisposeStreamProviderRef<UserProfile?>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

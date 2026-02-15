@@ -24,10 +24,7 @@ mixin _$EmergencyContact {
   String get id => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
   String get phone => throw _privateConstructorUsedError;
-  String? get email => throw _privateConstructorUsedError;
-  String? get relationship => throw _privateConstructorUsedError;
-  bool get isActive => throw _privateConstructorUsedError;
-  int get priority => throw _privateConstructorUsedError;
+  String get relationship => throw _privateConstructorUsedError;
 
   /// Serializes this EmergencyContact to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -46,15 +43,7 @@ abstract class $EmergencyContactCopyWith<$Res> {
     $Res Function(EmergencyContact) then,
   ) = _$EmergencyContactCopyWithImpl<$Res, EmergencyContact>;
   @useResult
-  $Res call({
-    String id,
-    String name,
-    String phone,
-    String? email,
-    String? relationship,
-    bool isActive,
-    int priority,
-  });
+  $Res call({String id, String name, String phone, String relationship});
 }
 
 /// @nodoc
@@ -75,10 +64,7 @@ class _$EmergencyContactCopyWithImpl<$Res, $Val extends EmergencyContact>
     Object? id = null,
     Object? name = null,
     Object? phone = null,
-    Object? email = freezed,
-    Object? relationship = freezed,
-    Object? isActive = null,
-    Object? priority = null,
+    Object? relationship = null,
   }) {
     return _then(
       _value.copyWith(
@@ -94,22 +80,10 @@ class _$EmergencyContactCopyWithImpl<$Res, $Val extends EmergencyContact>
                 ? _value.phone
                 : phone // ignore: cast_nullable_to_non_nullable
                       as String,
-            email: freezed == email
-                ? _value.email
-                : email // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            relationship: freezed == relationship
+            relationship: null == relationship
                 ? _value.relationship
                 : relationship // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            isActive: null == isActive
-                ? _value.isActive
-                : isActive // ignore: cast_nullable_to_non_nullable
-                      as bool,
-            priority: null == priority
-                ? _value.priority
-                : priority // ignore: cast_nullable_to_non_nullable
-                      as int,
+                      as String,
           )
           as $Val,
     );
@@ -125,15 +99,7 @@ abstract class _$$EmergencyContactImplCopyWith<$Res>
   ) = __$$EmergencyContactImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({
-    String id,
-    String name,
-    String phone,
-    String? email,
-    String? relationship,
-    bool isActive,
-    int priority,
-  });
+  $Res call({String id, String name, String phone, String relationship});
 }
 
 /// @nodoc
@@ -153,10 +119,7 @@ class __$$EmergencyContactImplCopyWithImpl<$Res>
     Object? id = null,
     Object? name = null,
     Object? phone = null,
-    Object? email = freezed,
-    Object? relationship = freezed,
-    Object? isActive = null,
-    Object? priority = null,
+    Object? relationship = null,
   }) {
     return _then(
       _$EmergencyContactImpl(
@@ -172,22 +135,10 @@ class __$$EmergencyContactImplCopyWithImpl<$Res>
             ? _value.phone
             : phone // ignore: cast_nullable_to_non_nullable
                   as String,
-        email: freezed == email
-            ? _value.email
-            : email // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        relationship: freezed == relationship
+        relationship: null == relationship
             ? _value.relationship
             : relationship // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        isActive: null == isActive
-            ? _value.isActive
-            : isActive // ignore: cast_nullable_to_non_nullable
-                  as bool,
-        priority: null == priority
-            ? _value.priority
-            : priority // ignore: cast_nullable_to_non_nullable
-                  as int,
+                  as String,
       ),
     );
   }
@@ -200,10 +151,7 @@ class _$EmergencyContactImpl implements _EmergencyContact {
     required this.id,
     required this.name,
     required this.phone,
-    this.email,
-    this.relationship,
-    this.isActive = true,
-    this.priority = 1,
+    required this.relationship,
   });
 
   factory _$EmergencyContactImpl.fromJson(Map<String, dynamic> json) =>
@@ -216,19 +164,11 @@ class _$EmergencyContactImpl implements _EmergencyContact {
   @override
   final String phone;
   @override
-  final String? email;
-  @override
-  final String? relationship;
-  @override
-  @JsonKey()
-  final bool isActive;
-  @override
-  @JsonKey()
-  final int priority;
+  final String relationship;
 
   @override
   String toString() {
-    return 'EmergencyContact(id: $id, name: $name, phone: $phone, email: $email, relationship: $relationship, isActive: $isActive, priority: $priority)';
+    return 'EmergencyContact(id: $id, name: $name, phone: $phone, relationship: $relationship)';
   }
 
   @override
@@ -239,27 +179,13 @@ class _$EmergencyContactImpl implements _EmergencyContact {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.phone, phone) || other.phone == phone) &&
-            (identical(other.email, email) || other.email == email) &&
             (identical(other.relationship, relationship) ||
-                other.relationship == relationship) &&
-            (identical(other.isActive, isActive) ||
-                other.isActive == isActive) &&
-            (identical(other.priority, priority) ||
-                other.priority == priority));
+                other.relationship == relationship));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-    runtimeType,
-    id,
-    name,
-    phone,
-    email,
-    relationship,
-    isActive,
-    priority,
-  );
+  int get hashCode => Object.hash(runtimeType, id, name, phone, relationship);
 
   /// Create a copy of EmergencyContact
   /// with the given fields replaced by the non-null parameter values.
@@ -283,10 +209,7 @@ abstract class _EmergencyContact implements EmergencyContact {
     required final String id,
     required final String name,
     required final String phone,
-    final String? email,
-    final String? relationship,
-    final bool isActive,
-    final int priority,
+    required final String relationship,
   }) = _$EmergencyContactImpl;
 
   factory _EmergencyContact.fromJson(Map<String, dynamic> json) =
@@ -299,13 +222,7 @@ abstract class _EmergencyContact implements EmergencyContact {
   @override
   String get phone;
   @override
-  String? get email;
-  @override
-  String? get relationship;
-  @override
-  bool get isActive;
-  @override
-  int get priority;
+  String get relationship;
 
   /// Create a copy of EmergencyContact
   /// with the given fields replaced by the non-null parameter values.

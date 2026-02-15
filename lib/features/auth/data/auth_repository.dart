@@ -46,4 +46,21 @@ class AuthRepository {
   Future<void> signOut() async {
     await _firebaseAuth.signOut();
   }
+
+  Future<void> reauthenticate(String password) async {
+    final user = _firebaseAuth.currentUser;
+    if (user == null || user.email == null) throw Exception('No user found');
+
+    final credential = EmailAuthProvider.credential(
+      email: user.email!,
+      password: password,
+    );
+    await user.reauthenticateWithCredential(credential);
+  }
+
+  Future<void> updatePassword(String newPassword) async {
+    final user = _firebaseAuth.currentUser;
+    if (user == null) throw Exception('No user found');
+    await user.updatePassword(newPassword);
+  }
 } // TODO: Add more auth methods as needed

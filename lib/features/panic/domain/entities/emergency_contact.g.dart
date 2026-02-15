@@ -12,10 +12,7 @@ _$EmergencyContactImpl _$$EmergencyContactImplFromJson(
   id: json['id'] as String,
   name: json['name'] as String,
   phone: json['phone'] as String,
-  email: json['email'] as String?,
-  relationship: json['relationship'] as String?,
-  isActive: json['isActive'] as bool? ?? true,
-  priority: (json['priority'] as num?)?.toInt() ?? 1,
+  relationship: json['relationship'] as String,
 );
 
 Map<String, dynamic> _$$EmergencyContactImplToJson(
@@ -24,8 +21,5 @@ Map<String, dynamic> _$$EmergencyContactImplToJson(
   'id': instance.id,
   'name': instance.name,
   'phone': instance.phone,
-  'email': instance.email,
   'relationship': instance.relationship,
-  'isActive': instance.isActive,
-  'priority': instance.priority,
 };

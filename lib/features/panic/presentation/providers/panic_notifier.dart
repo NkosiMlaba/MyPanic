@@ -11,10 +11,12 @@ import 'package:my_panic/core/services/haptic_service.dart';
 import 'package:my_panic/core/services/location_service.dart';
 import 'package:my_panic/features/panic/data/panic_repository.dart';
 import 'package:my_panic/features/panic/domain/panic_state.dart';
-import 'package:my_panic/features/panic/domain/entities/emergency_contact.dart';
+import 'package:my_panic/features/user_profile/presentation/providers/settings_provider.dart';
 
+import 'package:my_panic/features/panic/domain/entities/medical_profile.dart';
 import 'package:my_panic/features/trigger_engine/abstract_trigger_source.dart';
 import 'package:my_panic/features/trigger_engine/manual_trigger_source.dart';
+import 'package:my_panic/features/user_profile/data/contacts_repository.dart';
 import 'package:my_panic/features/user_profile/presentation/providers/medical_profile_provider.dart';
 
 part 'panic_notifier.g.dart';
@@ -59,9 +61,6 @@ LocationService locationService(Ref ref) {
 PanicRepository panicRepository(Ref ref) {
   return PanicRepository();
 }
-
-/// Countdown duration in seconds
-const int countdownDuration = 30;
 
 /// Main panic state notifier.
 /// Listens to trigger events and manages the panic flow.
@@ -108,8 +107,11 @@ class PanicNotifier extends _$PanicNotifier {
     final hapticService = ref.read(hapticServiceProvider);
     hapticService.startPanicVibration();
 
+    // Get duration from settings
+    final duration = ref.read(settingsProvider);
+
     state = PanicState.countingDown(
-      secondsRemaining: countdownDuration,
+      secondsRemaining: duration,
       triggeredAt: DateTime.now(),
     );
 
@@ -163,11 +165,20 @@ class PanicNotifier extends _$PanicNotifier {
       // Get current location
       final position = await locationService.getCurrentLocation();
 
-      // Get emergency contacts (dummy for MVP)
-      final contacts = _getDummyContacts();
+      // Get emergency contacts
+      // Since watchContacts is a stream, we take the latest value
+      final contacts = await ref
+          .read(contactsRepositoryProvider)
+          .watchContacts()
+          .first;
 
       // Get medical profile
       final profile = ref.read(medicalProfileProvider);
+
+      if (contacts.isEmpty) {
+        // Fallback or warning? For now, we proceed but maybe log it?
+        // Or we could have a check before _activateAlert
+      }
 
       // Send SMS to contacts
       await panicRepository.sendSmsToContacts(
@@ -178,7 +189,8 @@ class PanicNotifier extends _$PanicNotifier {
       // Send to backend
       final alertStatus = await panicRepository.sendEmergencyAlert(
         location: position,
-        profile: profile,
+        profile:
+            profile ?? const MedicalProfile(), // Handle null profile gracefully
         contacts: contacts,
       );
 
@@ -192,42 +204,6 @@ class PanicNotifier extends _$PanicNotifier {
         exception: e,
       );
     }
-  }
-
-  /// Returns dummy contacts for MVP testing.
-  List<EmergencyContact> _getDummyContacts() {
-    return [
-      const EmergencyContact(
-        id: '1',
-        name: 'Mom',
-        phone: '+27123456789',
-        relationship: 'Parent',
-      ),
-      const EmergencyContact(
-        id: '2',
-        name: 'Dad',
-        phone: '+27123456780',
-        relationship: 'Parent',
-      ),
-      const EmergencyContact(
-        id: '3',
-        name: 'Campus Security',
-        phone: '+27123456781',
-        relationship: 'Emergency Service',
-      ),
-      const EmergencyContact(
-        id: '4',
-        name: 'Best Friend',
-        phone: '+27123456782',
-        relationship: 'Friend',
-      ),
-      const EmergencyContact(
-        id: '5',
-        name: 'Resident Advisor',
-        phone: '+27123456783',
-        relationship: 'University Staff',
-      ),
-    ];
   }
 
   /// Resets the panic system to armed state.

@@ -25,6 +25,7 @@ _$MedicalProfileImpl _$$MedicalProfileImplFromJson(Map<String, dynamic> json) =>
               .toList() ??
           const [],
       emergencyNotes: json['emergencyNotes'] as String?,
+      insuranceInfo: json['insuranceInfo'] as String?,
       doctorName: json['doctorName'] as String?,
       doctorPhone: json['doctorPhone'] as String?,
     );
@@ -37,6 +38,7 @@ Map<String, dynamic> _$$MedicalProfileImplToJson(
   'medications': instance.medications,
   'conditions': instance.conditions,
   'emergencyNotes': instance.emergencyNotes,
+  'insuranceInfo': instance.insuranceInfo,
   'doctorName': instance.doctorName,
   'doctorPhone': instance.doctorPhone,
 };

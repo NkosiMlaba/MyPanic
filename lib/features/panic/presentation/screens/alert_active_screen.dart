@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:my_panic/core/theme/app_theme.dart';
 import 'package:my_panic/features/panic/presentation/providers/panic_notifier.dart';
+import 'package:my_panic/features/user_profile/presentation/providers/contacts_provider.dart';
 import 'package:my_panic/features/user_profile/presentation/providers/medical_profile_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -107,6 +108,9 @@ class AlertActiveScreen extends ConsumerWidget {
                       child: Consumer(
                         builder: (context, ref, child) {
                           final profile = ref.watch(medicalProfileProvider);
+                          if (profile == null) {
+                            return const SizedBox.shrink(); // Hide if no profile
+                          }
                           return Container(
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
@@ -161,27 +165,51 @@ class AlertActiveScreen extends ConsumerWidget {
 
                     const SizedBox(height: 16),
 
-                    // Emergency contacts list (minimal)
+                    // Emergency contacts list (real)
                     Expanded(
-                      child: SingleChildScrollView(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 32),
-                          child: Column(
-                            children: [
-                              _buildContactRow('Mom', '+27123456789'),
-                              _buildContactRow('Dad', '+27123456780'),
-                              _buildContactRow(
-                                'Campus Security',
-                                '+27123456781',
+                      child: Consumer(
+                        builder: (context, ref, child) {
+                          final contactsAsync = ref.watch(contactsListProvider);
+
+                          return contactsAsync.when(
+                            data: (contacts) {
+                              if (contacts.isEmpty) {
+                                return const Center(
+                                  child: Text(
+                                    'No contacts notified',
+                                    style: TextStyle(color: Colors.white54),
+                                  ),
+                                );
+                              }
+                              return SingleChildScrollView(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 32,
+                                  ),
+                                  child: Column(
+                                    children: contacts
+                                        .map(
+                                          (contact) => _buildContactRow(
+                                            contact.name,
+                                            contact.phone,
+                                          ),
+                                        )
+                                        .toList(),
+                                  ),
+                                ),
+                              );
+                            },
+                            loading: () => const Center(
+                              child: CircularProgressIndicator(
+                                color: AppTheme.primaryRed,
                               ),
-                              _buildContactRow('Best Friend', '+27123456782'),
-                              _buildContactRow(
-                                'Resident Advisor',
-                                '+27123456783',
-                              ),
-                            ],
-                          ),
-                        ),
+                            ),
+                            error: (_, __) => const Text(
+                              'Error loading contacts',
+                              style: TextStyle(color: Colors.red),
+                            ),
+                          );
+                        },
                       ),
                     ),
                   ],

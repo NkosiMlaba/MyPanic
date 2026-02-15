@@ -18,6 +18,7 @@ class MedicalProfile with _$MedicalProfile {
     @Default([]) List<String> medications,
     @Default([]) List<String> conditions,
     String? emergencyNotes,
+    String? insuranceInfo,
     String? doctorName,
     String? doctorPhone,
   }) = _MedicalProfile;

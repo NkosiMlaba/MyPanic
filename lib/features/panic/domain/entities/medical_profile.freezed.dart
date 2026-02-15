@@ -26,6 +26,7 @@ mixin _$MedicalProfile {
   List<String> get medications => throw _privateConstructorUsedError;
   List<String> get conditions => throw _privateConstructorUsedError;
   String? get emergencyNotes => throw _privateConstructorUsedError;
+  String? get insuranceInfo => throw _privateConstructorUsedError;
   String? get doctorName => throw _privateConstructorUsedError;
   String? get doctorPhone => throw _privateConstructorUsedError;
 
@@ -52,6 +53,7 @@ abstract class $MedicalProfileCopyWith<$Res> {
     List<String> medications,
     List<String> conditions,
     String? emergencyNotes,
+    String? insuranceInfo,
     String? doctorName,
     String? doctorPhone,
   });
@@ -77,6 +79,7 @@ class _$MedicalProfileCopyWithImpl<$Res, $Val extends MedicalProfile>
     Object? medications = null,
     Object? conditions = null,
     Object? emergencyNotes = freezed,
+    Object? insuranceInfo = freezed,
     Object? doctorName = freezed,
     Object? doctorPhone = freezed,
   }) {
@@ -101,6 +104,10 @@ class _$MedicalProfileCopyWithImpl<$Res, $Val extends MedicalProfile>
             emergencyNotes: freezed == emergencyNotes
                 ? _value.emergencyNotes
                 : emergencyNotes // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            insuranceInfo: freezed == insuranceInfo
+                ? _value.insuranceInfo
+                : insuranceInfo // ignore: cast_nullable_to_non_nullable
                       as String?,
             doctorName: freezed == doctorName
                 ? _value.doctorName
@@ -131,6 +138,7 @@ abstract class _$$MedicalProfileImplCopyWith<$Res>
     List<String> medications,
     List<String> conditions,
     String? emergencyNotes,
+    String? insuranceInfo,
     String? doctorName,
     String? doctorPhone,
   });
@@ -155,6 +163,7 @@ class __$$MedicalProfileImplCopyWithImpl<$Res>
     Object? medications = null,
     Object? conditions = null,
     Object? emergencyNotes = freezed,
+    Object? insuranceInfo = freezed,
     Object? doctorName = freezed,
     Object? doctorPhone = freezed,
   }) {
@@ -180,6 +189,10 @@ class __$$MedicalProfileImplCopyWithImpl<$Res>
             ? _value.emergencyNotes
             : emergencyNotes // ignore: cast_nullable_to_non_nullable
                   as String?,
+        insuranceInfo: freezed == insuranceInfo
+            ? _value.insuranceInfo
+            : insuranceInfo // ignore: cast_nullable_to_non_nullable
+                  as String?,
         doctorName: freezed == doctorName
             ? _value.doctorName
             : doctorName // ignore: cast_nullable_to_non_nullable
@@ -202,6 +215,7 @@ class _$MedicalProfileImpl implements _MedicalProfile {
     final List<String> medications = const [],
     final List<String> conditions = const [],
     this.emergencyNotes,
+    this.insuranceInfo,
     this.doctorName,
     this.doctorPhone,
   }) : _allergies = allergies,
@@ -243,13 +257,15 @@ class _$MedicalProfileImpl implements _MedicalProfile {
   @override
   final String? emergencyNotes;
   @override
+  final String? insuranceInfo;
+  @override
   final String? doctorName;
   @override
   final String? doctorPhone;
 
   @override
   String toString() {
-    return 'MedicalProfile(bloodType: $bloodType, allergies: $allergies, medications: $medications, conditions: $conditions, emergencyNotes: $emergencyNotes, doctorName: $doctorName, doctorPhone: $doctorPhone)';
+    return 'MedicalProfile(bloodType: $bloodType, allergies: $allergies, medications: $medications, conditions: $conditions, emergencyNotes: $emergencyNotes, insuranceInfo: $insuranceInfo, doctorName: $doctorName, doctorPhone: $doctorPhone)';
   }
 
   @override
@@ -273,6 +289,8 @@ class _$MedicalProfileImpl implements _MedicalProfile {
             ) &&
             (identical(other.emergencyNotes, emergencyNotes) ||
                 other.emergencyNotes == emergencyNotes) &&
+            (identical(other.insuranceInfo, insuranceInfo) ||
+                other.insuranceInfo == insuranceInfo) &&
             (identical(other.doctorName, doctorName) ||
                 other.doctorName == doctorName) &&
             (identical(other.doctorPhone, doctorPhone) ||
@@ -288,6 +306,7 @@ class _$MedicalProfileImpl implements _MedicalProfile {
     const DeepCollectionEquality().hash(_medications),
     const DeepCollectionEquality().hash(_conditions),
     emergencyNotes,
+    insuranceInfo,
     doctorName,
     doctorPhone,
   );
@@ -316,6 +335,7 @@ abstract class _MedicalProfile implements MedicalProfile {
     final List<String> medications,
     final List<String> conditions,
     final String? emergencyNotes,
+    final String? insuranceInfo,
     final String? doctorName,
     final String? doctorPhone,
   }) = _$MedicalProfileImpl;
@@ -333,6 +353,8 @@ abstract class _MedicalProfile implements MedicalProfile {
   List<String> get conditions;
   @override
   String? get emergencyNotes;
+  @override
+  String? get insuranceInfo;
   @override
   String? get doctorName;
   @override

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:my_panic/core/theme/app_theme.dart';
 import 'package:my_panic/features/auth/data/auth_repository.dart';
+import 'package:my_panic/features/auth/presentation/providers/auth_notifier.dart';
 
 class VerifyEmailScreen extends ConsumerStatefulWidget {
   const VerifyEmailScreen({super.key});
@@ -46,14 +47,9 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
       await user.reload(); // Refresh user data
       if (user.emailVerified) {
         _timer?.cancel();
-        // Router will automatically redirect when it detects verified state
-        // if we are listening to user changes properly.
-        // However, authStateChanges might not fire on reload(), so we might need
-        // to force a refresh or the router should check user.emailVerified.
-        // For now, let's rely on the router's refresh list.
         if (mounted) {
-          // Providing a manual refresh hint could be done via a provider update
-          // but normally we might just wait or manually trigger a router refresh.
+          // Force a refresh of the auth state so the router picks up the change
+          ref.invalidate(authNotifierProvider);
         }
       }
     }

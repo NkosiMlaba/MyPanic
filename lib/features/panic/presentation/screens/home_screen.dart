@@ -6,6 +6,8 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:my_panic/core/router/app_router.dart';
 import 'package:my_panic/core/theme/app_theme.dart';
 import 'package:my_panic/features/panic/domain/panic_state.dart';
 import 'package:my_panic/features/panic/presentation/providers/panic_notifier.dart';
@@ -58,7 +60,7 @@ class HomeScreen extends ConsumerWidget {
                         icon: const Icon(Icons.settings_outlined),
                         color: AppTheme.textSecondary,
                         onPressed: () {
-                          // TODO: Navigate to settings
+                          context.push(AppRoutes.settings);
                         },
                       ),
                     ],

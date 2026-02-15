@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:my_panic/core/theme/app_theme.dart';
 
 import 'package:my_panic/features/panic/presentation/providers/panic_notifier.dart';
+import 'package:my_panic/features/user_profile/presentation/providers/settings_provider.dart';
 
 /// Countdown screen with timer and cancel option.
 class CountdownScreen extends ConsumerWidget {
@@ -24,7 +25,8 @@ class CountdownScreen extends ConsumerWidget {
       orElse: () => 0,
     );
 
-    final progress = secondsRemaining / countdownDuration;
+    final totalDuration = ref.watch(settingsProvider);
+    final progress = secondsRemaining / totalDuration;
 
     return Scaffold(
       backgroundColor: const Color(0xFF1A0A0A), // Dark red tinted background

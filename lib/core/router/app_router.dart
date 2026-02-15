@@ -4,7 +4,6 @@ library;
 ///
 /// Handles routing between panic states and screens, including authentication.
 
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -13,13 +12,18 @@ import 'package:my_panic/features/auth/presentation/providers/auth_notifier.dart
 import 'package:my_panic/features/auth/presentation/screens/login_screen.dart';
 import 'package:my_panic/features/auth/presentation/screens/signup_screen.dart';
 import 'package:my_panic/features/auth/presentation/screens/forgot_password_screen.dart';
+import 'package:my_panic/features/auth/presentation/screens/change_password_screen.dart';
 import 'package:my_panic/features/auth/presentation/screens/verify_email_screen.dart';
-
 import 'package:my_panic/features/panic/presentation/providers/panic_notifier.dart';
 import 'package:my_panic/features/panic/presentation/screens/home_screen.dart';
 import 'package:my_panic/features/panic/presentation/screens/countdown_screen.dart';
 import 'package:my_panic/features/panic/presentation/screens/alert_active_screen.dart';
 import 'package:my_panic/features/panic/domain/panic_state.dart';
+import 'package:my_panic/features/user_profile/presentation/providers/user_profile_provider.dart';
+import 'package:my_panic/features/user_profile/presentation/screens/onboarding_screen.dart';
+import 'package:my_panic/features/user_profile/presentation/screens/settings_screen.dart';
+import 'package:my_panic/features/user_profile/presentation/screens/contacts_screen.dart';
+import 'package:my_panic/features/user_profile/presentation/screens/edit_profile_screen.dart';
 
 part 'app_router.g.dart';
 
@@ -30,6 +34,11 @@ class AppRoutes {
   static const String signup = '/signup';
   static const String forgotPassword = '/forgot-password';
   static const String verifyEmail = '/verify-email';
+  static const String onboarding = '/onboarding';
+  static const String settings = '/settings';
+  static const String contacts = '/contacts';
+  static const String editProfile = '/edit-profile';
+  static const String changePassword = '/change-password';
   static const String countdown = '/countdown';
   static const String alertActive = '/alert-active';
 }
@@ -39,6 +48,8 @@ class AppRoutes {
 GoRouter goRouter(Ref ref) {
   // Watch auth state to trigger redirects
   final authState = ref.watch(authNotifierProvider);
+  // Watch user profile state
+  final userProfileState = ref.watch(userProfileProvider);
   // Watch panic state for panic flow redirects
   final panicState = ref.watch(panicNotifierProvider);
 
@@ -49,11 +60,16 @@ GoRouter goRouter(Ref ref) {
       final isLoggedIn = authState.valueOrNull != null;
       final isVerified = authState.valueOrNull?.emailVerified ?? false;
 
+      final userProfile = userProfileState.valueOrNull;
+      final isProfileComplete = userProfile?.isProfileComplete ?? false;
+
       final currentPath = state.uri.path;
       final isLoginRoute = currentPath == AppRoutes.login;
       final isSignUpRoute = currentPath == AppRoutes.signup;
       final isForgotPasswordRoute = currentPath == AppRoutes.forgotPassword;
       final isVerifyEmailRoute = currentPath == AppRoutes.verifyEmail;
+      final isOnboardingRoute = currentPath == AppRoutes.onboarding;
+
       final isAuthRoute =
           isLoginRoute || isSignUpRoute || isForgotPasswordRoute;
 
@@ -67,12 +83,27 @@ GoRouter goRouter(Ref ref) {
         return isVerifyEmailRoute ? null : AppRoutes.verifyEmail;
       }
 
-      // 3. If logged in and verified, prevent access to auth routes
-      if (isLoggedIn && isVerified && (isAuthRoute || isVerifyEmailRoute)) {
+      // 3. User is logged in and verified
+
+      // a. Check Profile Completion
+      // If profile is NOT complete, force onboarding
+      // Note: We check if userProfileState is loading to avoid premature redirect?
+      // Actually, if value is null, it might mean loading or no profile.
+      // Firestore returns null if doc doesn't exist.
+      // So if (isLoggedIn && isVerified && !isProfileComplete) -> Onboarding
+      if (isLoggedIn && isVerified && !isProfileComplete) {
+        return isOnboardingRoute ? null : AppRoutes.onboarding;
+      }
+
+      // b. If profile IS complete, prevent access to auth/onboarding routes
+      if (isLoggedIn &&
+          isVerified &&
+          isProfileComplete &&
+          (isAuthRoute || isVerifyEmailRoute || isOnboardingRoute)) {
         return AppRoutes.home;
       }
 
-      // 4. Panic State Redirection (Only if authorized)
+      // 4. Panic State Redirection (Only if authorized and profile set)
       if (panicState is PanicStateCountingDown &&
           currentPath != AppRoutes.countdown) {
         return AppRoutes.countdown;
@@ -111,12 +142,32 @@ GoRouter goRouter(Ref ref) {
         builder: (context, state) => const VerifyEmailScreen(),
       ),
       GoRoute(
+        path: AppRoutes.onboarding,
+        builder: (context, state) => const OnboardingScreen(),
+      ),
+      GoRoute(
         path: AppRoutes.countdown,
         builder: (context, state) => const CountdownScreen(),
       ),
       GoRoute(
         path: AppRoutes.alertActive,
         builder: (context, state) => const AlertActiveScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.settings,
+        builder: (context, state) => const SettingsScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.contacts,
+        builder: (context, state) => const ContactsScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.editProfile,
+        builder: (context, state) => const EditProfileScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.changePassword,
+        builder: (context, state) => const ChangePasswordScreen(),
       ),
     ],
   );
