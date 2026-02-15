@@ -25,6 +25,8 @@ import 'package:my_panic/features/user_profile/presentation/screens/settings_scr
 import 'package:my_panic/features/user_profile/presentation/screens/contacts_screen.dart';
 import 'package:my_panic/features/user_profile/presentation/screens/edit_profile_screen.dart';
 
+import 'package:my_panic/core/utils/router_logger.dart';
+
 part 'app_router.g.dart';
 
 /// Route paths
@@ -56,6 +58,7 @@ GoRouter goRouter(Ref ref) {
   return GoRouter(
     initialLocation: AppRoutes.home,
     debugLogDiagnostics: true,
+    observers: [RouterLogger()],
     redirect: (context, state) {
       final isLoggedIn = authState.valueOrNull != null;
       final isVerified = authState.valueOrNull?.emailVerified ?? false;

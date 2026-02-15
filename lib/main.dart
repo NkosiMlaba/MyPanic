@@ -11,6 +11,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:my_panic/core/theme/app_theme.dart';
 import 'package:my_panic/core/router/app_router.dart';
 
+import 'package:my_panic/core/utils/riverpod_logger.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -36,7 +38,9 @@ void main() async {
     ),
   );
 
-  runApp(const ProviderScope(child: MyPanicApp()));
+  runApp(
+    ProviderScope(observers: [RiverpodLogger()], child: const MyPanicApp()),
+  );
 }
 
 /// Main application widget.
