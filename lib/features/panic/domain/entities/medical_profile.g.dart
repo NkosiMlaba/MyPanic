@@ -6,8 +6,8 @@ part of 'medical_profile.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$MedicalProfileImpl _$$MedicalProfileImplFromJson(Map<String, dynamic> json) =>
-    _$MedicalProfileImpl(
+MedicalProfile _$MedicalProfileFromJson(Map<String, dynamic> json) =>
+    MedicalProfile(
       bloodType: json['bloodType'] as String?,
       allergies:
           (json['allergies'] as List<dynamic>?)
@@ -30,15 +30,14 @@ _$MedicalProfileImpl _$$MedicalProfileImplFromJson(Map<String, dynamic> json) =>
       doctorPhone: json['doctorPhone'] as String?,
     );
 
-Map<String, dynamic> _$$MedicalProfileImplToJson(
-  _$MedicalProfileImpl instance,
-) => <String, dynamic>{
-  'bloodType': instance.bloodType,
-  'allergies': instance.allergies,
-  'medications': instance.medications,
-  'conditions': instance.conditions,
-  'emergencyNotes': instance.emergencyNotes,
-  'insuranceInfo': instance.insuranceInfo,
-  'doctorName': instance.doctorName,
-  'doctorPhone': instance.doctorPhone,
-};
+Map<String, dynamic> _$MedicalProfileToJson(MedicalProfile instance) =>
+    <String, dynamic>{
+      'bloodType': instance.bloodType,
+      'allergies': instance.allergies,
+      'medications': instance.medications,
+      'conditions': instance.conditions,
+      'emergencyNotes': instance.emergencyNotes,
+      'insuranceInfo': instance.insuranceInfo,
+      'doctorName': instance.doctorName,
+      'doctorPhone': instance.doctorPhone,
+    };

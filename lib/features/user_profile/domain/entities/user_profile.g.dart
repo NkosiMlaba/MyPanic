@@ -26,6 +26,6 @@ Map<String, dynamic> _$$UserProfileImplToJson(_$UserProfileImpl instance) =>
       'firstName': instance.firstName,
       'lastName': instance.lastName,
       'phoneNumber': instance.phoneNumber,
-      'medicalProfile': instance.medicalProfile,
+      'medicalProfile': instance.medicalProfile.toJson(),
       'isProfileComplete': instance.isProfileComplete,
     };

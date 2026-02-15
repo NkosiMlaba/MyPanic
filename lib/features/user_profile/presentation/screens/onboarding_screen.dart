@@ -80,13 +80,24 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         isProfileComplete: true,
       );
 
+      debugPrint('Creating UserProfile:');
+      debugPrint('UID: ${user.uid}');
+      debugPrint('Email: ${user.email}');
+      debugPrint(
+        'Name: ${_firstNameController.text} ${_lastNameController.text}',
+      );
+      debugPrint('Phone: ${_phoneController.text}');
+      debugPrint('Medical: $medicalProfile');
+
       await ref.read(userProfileRepositoryProvider).createUserProfile(profile);
 
       // Router should pick up the change in profile stream or we force refresh
       if (mounted) {
         // Force router refresh if needed, but the router should act on the stream
       }
-    } catch (e) {
+    } catch (e, st) {
+      debugPrint('Error saving profile: $e');
+      debugPrint('Stack trace: $st');
       if (mounted) {
         ScaffoldMessenger.of(
           context,

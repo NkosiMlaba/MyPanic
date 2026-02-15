@@ -55,8 +55,6 @@ abstract class $UserProfileCopyWith<$Res> {
     MedicalProfile medicalProfile,
     bool isProfileComplete,
   });
-
-  $MedicalProfileCopyWith<$Res> get medicalProfile;
 }
 
 /// @nodoc
@@ -116,16 +114,6 @@ class _$UserProfileCopyWithImpl<$Res, $Val extends UserProfile>
           as $Val,
     );
   }
-
-  /// Create a copy of UserProfile
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $MedicalProfileCopyWith<$Res> get medicalProfile {
-    return $MedicalProfileCopyWith<$Res>(_value.medicalProfile, (value) {
-      return _then(_value.copyWith(medicalProfile: value) as $Val);
-    });
-  }
 }
 
 /// @nodoc
@@ -146,9 +134,6 @@ abstract class _$$UserProfileImplCopyWith<$Res>
     MedicalProfile medicalProfile,
     bool isProfileComplete,
   });
-
-  @override
-  $MedicalProfileCopyWith<$Res> get medicalProfile;
 }
 
 /// @nodoc

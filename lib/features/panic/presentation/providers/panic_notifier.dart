@@ -189,8 +189,7 @@ class PanicNotifier extends _$PanicNotifier {
       // Send to backend
       final alertStatus = await panicRepository.sendEmergencyAlert(
         location: position,
-        profile:
-            profile ?? const MedicalProfile(), // Handle null profile gracefully
+        profile: profile ?? MedicalProfile(), // Handle null profile gracefully
         contacts: contacts,
       );
 
