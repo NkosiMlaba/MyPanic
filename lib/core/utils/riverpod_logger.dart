@@ -1,4 +1,4 @@
-import 'dart:developer';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class RiverpodLogger extends ProviderObserver {
@@ -9,10 +9,9 @@ class RiverpodLogger extends ProviderObserver {
     Object? newValue,
     ProviderContainer container,
   ) {
-    log(
-      'State Change: ${provider.name ?? provider.runtimeType}',
-      name: 'Riverpod',
-      error: 'New: $newValue',
+    debugPrint(
+      '[Riverpod] State Change: ${provider.name ?? provider.runtimeType}\n'
+      '   New: $newValue',
     );
   }
 
@@ -22,10 +21,9 @@ class RiverpodLogger extends ProviderObserver {
     Object? value,
     ProviderContainer container,
   ) {
-    log(
-      'Provider Initialized: ${provider.name ?? provider.runtimeType}',
-      name: 'Riverpod',
-      error: 'Value: $value',
+    debugPrint(
+      '[Riverpod] Provider Initialized: ${provider.name ?? provider.runtimeType}\n'
+      '   Value: $value',
     );
   }
 
@@ -36,11 +34,10 @@ class RiverpodLogger extends ProviderObserver {
     StackTrace stackTrace,
     ProviderContainer container,
   ) {
-    log(
-      'Provider Failed: ${provider.name ?? provider.runtimeType}',
-      name: 'Riverpod',
-      error: error,
-      stackTrace: stackTrace,
+    debugPrint(
+      '[Riverpod] Provider Failed: ${provider.name ?? provider.runtimeType}\n'
+      '   Error: $error\n'
+      '   Stack: $stackTrace',
     );
   }
 }
