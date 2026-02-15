@@ -14,11 +14,65 @@ import 'package:my_panic/features/panic/presentation/providers/panic_notifier.da
 import 'package:my_panic/features/panic/presentation/widgets/panic_button_widget.dart';
 
 /// Home screen with the main panic button.
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    _checkLocationStatus();
+  }
+
+  Future<void> _checkLocationStatus() async {
+    final locationService = ref.read(locationServiceProvider);
+
+    // Check service status
+    final serviceEnabled = await locationService.isServiceEnabled();
+    if (!serviceEnabled && mounted) {
+      _showLocationDialog(
+        'Location Services Disabled',
+        'Please enable location services to use the panic button effectively.',
+      );
+      return;
+    }
+
+    // Check permissions
+    final hasPermission = await locationService.hasPermission();
+    if (!hasPermission && mounted) {
+      final request = await locationService.requestPermission();
+      if (!request && mounted) {
+        _showLocationDialog(
+          'Location Permission Needed',
+          'We need your location to send emergency alerts. Please grant permission.',
+        );
+      }
+    }
+  }
+
+  void _showLocationDialog(String title, String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppTheme.surfaceDark,
+        title: Text(title, style: const TextStyle(color: Colors.white)),
+        content: Text(message, style: const TextStyle(color: Colors.white70)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final panicState = ref.watch(panicNotifierProvider);
 
     return Scaffold(

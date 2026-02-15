@@ -87,14 +87,14 @@ class PanicNotifier extends _$PanicNotifier {
   }
 
   /// Called when a panic trigger event is received.
-  void _onPanicTriggered(TriggerEvent event) {
+  Future<void> _onPanicTriggered(TriggerEvent event) async {
     if (state is! PanicStateArmed) return;
 
-    _startCountdown();
+    await _startCountdown();
   }
 
   /// Manually trigger panic (for testing or direct button trigger)
-  void triggerPanic() {
+  Future<void> triggerPanic() async {
     if (state is! PanicStateArmed) return;
 
     // Get the manual trigger and fire it
@@ -103,7 +103,19 @@ class PanicNotifier extends _$PanicNotifier {
   }
 
   /// Starts the countdown timer.
-  void _startCountdown() {
+  Future<void> _startCountdown() async {
+    // Check location first
+    final locationService = ref.read(locationServiceProvider);
+    final serviceEnabled = await locationService.isServiceEnabled();
+    final hasPermission = await locationService.hasPermission();
+
+    if (!serviceEnabled || !hasPermission) {
+      state = const PanicState.error(
+        message: 'Location services or permissions are disabled.',
+      );
+      return;
+    }
+
     final hapticService = ref.read(hapticServiceProvider);
     hapticService.startPanicVibration();
 

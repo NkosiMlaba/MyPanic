@@ -62,4 +62,9 @@ class LocationService {
     return permission == LocationPermission.always ||
         permission == LocationPermission.whileInUse;
   }
+
+  /// Checks if location services are enabled.
+  Future<bool> isServiceEnabled() async {
+    return await Geolocator.isLocationServiceEnabled();
+  }
 }
