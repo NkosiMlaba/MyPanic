@@ -18,6 +18,7 @@ samples, guidance on mobile development, and a full API reference.
 <!-- Android app running -->
 flutter clean
 flutter pub get
+flutter devices
 flutter run -d MPK0222525000545
 
 
@@ -32,3 +33,5 @@ There's also a current issue where the app does not fetch the database info on a
     So it must check remote DB then local db, if remote is empty, then local is empty, if remote has data, then local must have data
     Even the 30 second timer was affected, and it would only sync after going to settings
     Like it shouldn't re prompt for your info if you are logging in and already have info in the database
+
+So hardcoding the status values on the home screen like the number of contacts and active location status
