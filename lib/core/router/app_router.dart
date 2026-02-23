@@ -64,7 +64,11 @@ GoRouter goRouter(Ref ref) {
       final isVerified = authState.valueOrNull?.emailVerified ?? false;
 
       final userProfile = userProfileState.valueOrNull;
-      final isProfileComplete = userProfile?.isProfileComplete ?? false;
+      // A profile is considered complete if the flag is set OR if the document
+      // exists and has a firstName (handles accounts predating the flag).
+      final isProfileComplete =
+          (userProfile?.isProfileComplete ?? false) ||
+          ((userProfile?.firstName ?? '').isNotEmpty);
 
       final currentPath = state.uri.path;
       final isLoginRoute = currentPath == AppRoutes.login;
@@ -88,13 +92,37 @@ GoRouter goRouter(Ref ref) {
 
       // 3. User is logged in and verified
 
+      print(
+        '[Router] redirect fired. userProfileState runtimeType: ${userProfileState.runtimeType}',
+      );
+      print(
+        '[Router] userProfileState.isLoading: ${userProfileState.isLoading}',
+      );
+      print('[Router] userProfileState.hasValue: ${userProfileState.hasValue}');
+      print(
+        '[Router] userProfileState.valueOrNull: ${userProfileState.valueOrNull}',
+      );
+      print('[Router] isProfileComplete: $isProfileComplete');
+
+      // Wait for the profile stream to emit past the initial cache-miss.
+      // If the state is AsyncLoading (even if it has no value), we must wait.
+      // Firestore streams start in AsyncLoading until the first server or valid cache read.
+      if (userProfileState is AsyncLoading) {
+        print('[Router] State is AsyncLoading. Waiting...');
+        return null;
+      }
+
+      // Also wait if we simply have no data yet and it's still loading
+      if (userProfileState.isLoading) {
+        print('[Router] State isLoading=true. Waiting...');
+        return null;
+      }
+
+      // If we *have* completed loading, and still have no value, it's a brand new user
+      // OR a user who needs to complete the profile.
       // a. Check Profile Completion
-      // If profile is NOT complete, force onboarding
-      // Note: We check if userProfileState is loading to avoid premature redirect?
-      // Actually, if value is null, it might mean loading or no profile.
-      // Firestore returns null if doc doesn't exist.
-      // So if (isLoggedIn && isVerified && !isProfileComplete) -> Onboarding
       if (isLoggedIn && isVerified && !isProfileComplete) {
+        print('[Router] Profile NOT complete. Redirecting to onboarding.');
         return isOnboardingRoute ? null : AppRoutes.onboarding;
       }
 

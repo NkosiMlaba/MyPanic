@@ -17,6 +17,7 @@ _$UserProfileImpl _$$UserProfileImplFromJson(Map<String, dynamic> json) =>
         json['medicalProfile'] as Map<String, dynamic>,
       ),
       isProfileComplete: json['isProfileComplete'] as bool? ?? false,
+      countdownDuration: (json['countdownDuration'] as num?)?.toInt() ?? 30,
     );
 
 Map<String, dynamic> _$$UserProfileImplToJson(_$UserProfileImpl instance) =>
@@ -28,4 +29,5 @@ Map<String, dynamic> _$$UserProfileImplToJson(_$UserProfileImpl instance) =>
       'phoneNumber': instance.phoneNumber,
       'medicalProfile': instance.medicalProfile.toJson(),
       'isProfileComplete': instance.isProfileComplete,
+      'countdownDuration': instance.countdownDuration,
     };

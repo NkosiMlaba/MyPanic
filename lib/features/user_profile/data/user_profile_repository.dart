@@ -71,6 +71,23 @@ class UserProfileRepository {
   Stream<UserProfile?> watchUserProfile() {
     final uid = currentUserId;
     if (uid == null) return Stream.value(null);
-    return _usersRef().doc(uid).snapshots().map((doc) => doc.data());
+
+    return _usersRef()
+        .doc(uid)
+        // includeMetadataChanges lets us inspect where the snapshot came from
+        .snapshots(includeMetadataChanges: true)
+        .where((doc) {
+          // If the document doesn't exist AND it's from the local cache,
+          // it means we're still waiting for the server response.
+          // Skip this emission so the provider stays in AsyncLoading.
+          if (!doc.exists && doc.metadata.isFromCache) {
+            print(
+              '[UserProfileRepository] Snapshot from cache and !exists. Ignoring.',
+            );
+            return false;
+          }
+          return true;
+        })
+        .map((doc) => doc.data());
   }
 }

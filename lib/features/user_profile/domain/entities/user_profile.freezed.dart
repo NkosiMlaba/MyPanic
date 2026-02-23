@@ -28,6 +28,7 @@ mixin _$UserProfile {
   String get phoneNumber => throw _privateConstructorUsedError;
   MedicalProfile get medicalProfile => throw _privateConstructorUsedError;
   bool get isProfileComplete => throw _privateConstructorUsedError;
+  int get countdownDuration => throw _privateConstructorUsedError;
 
   /// Serializes this UserProfile to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -54,6 +55,7 @@ abstract class $UserProfileCopyWith<$Res> {
     String phoneNumber,
     MedicalProfile medicalProfile,
     bool isProfileComplete,
+    int countdownDuration,
   });
 }
 
@@ -79,6 +81,7 @@ class _$UserProfileCopyWithImpl<$Res, $Val extends UserProfile>
     Object? phoneNumber = null,
     Object? medicalProfile = null,
     Object? isProfileComplete = null,
+    Object? countdownDuration = null,
   }) {
     return _then(
       _value.copyWith(
@@ -110,6 +113,10 @@ class _$UserProfileCopyWithImpl<$Res, $Val extends UserProfile>
                 ? _value.isProfileComplete
                 : isProfileComplete // ignore: cast_nullable_to_non_nullable
                       as bool,
+            countdownDuration: null == countdownDuration
+                ? _value.countdownDuration
+                : countdownDuration // ignore: cast_nullable_to_non_nullable
+                      as int,
           )
           as $Val,
     );
@@ -133,6 +140,7 @@ abstract class _$$UserProfileImplCopyWith<$Res>
     String phoneNumber,
     MedicalProfile medicalProfile,
     bool isProfileComplete,
+    int countdownDuration,
   });
 }
 
@@ -157,6 +165,7 @@ class __$$UserProfileImplCopyWithImpl<$Res>
     Object? phoneNumber = null,
     Object? medicalProfile = null,
     Object? isProfileComplete = null,
+    Object? countdownDuration = null,
   }) {
     return _then(
       _$UserProfileImpl(
@@ -188,6 +197,10 @@ class __$$UserProfileImplCopyWithImpl<$Res>
             ? _value.isProfileComplete
             : isProfileComplete // ignore: cast_nullable_to_non_nullable
                   as bool,
+        countdownDuration: null == countdownDuration
+            ? _value.countdownDuration
+            : countdownDuration // ignore: cast_nullable_to_non_nullable
+                  as int,
       ),
     );
   }
@@ -204,6 +217,7 @@ class _$UserProfileImpl implements _UserProfile {
     required this.phoneNumber,
     required this.medicalProfile,
     this.isProfileComplete = false,
+    this.countdownDuration = 30,
   });
 
   factory _$UserProfileImpl.fromJson(Map<String, dynamic> json) =>
@@ -224,10 +238,13 @@ class _$UserProfileImpl implements _UserProfile {
   @override
   @JsonKey()
   final bool isProfileComplete;
+  @override
+  @JsonKey()
+  final int countdownDuration;
 
   @override
   String toString() {
-    return 'UserProfile(uid: $uid, email: $email, firstName: $firstName, lastName: $lastName, phoneNumber: $phoneNumber, medicalProfile: $medicalProfile, isProfileComplete: $isProfileComplete)';
+    return 'UserProfile(uid: $uid, email: $email, firstName: $firstName, lastName: $lastName, phoneNumber: $phoneNumber, medicalProfile: $medicalProfile, isProfileComplete: $isProfileComplete, countdownDuration: $countdownDuration)';
   }
 
   @override
@@ -246,7 +263,9 @@ class _$UserProfileImpl implements _UserProfile {
             (identical(other.medicalProfile, medicalProfile) ||
                 other.medicalProfile == medicalProfile) &&
             (identical(other.isProfileComplete, isProfileComplete) ||
-                other.isProfileComplete == isProfileComplete));
+                other.isProfileComplete == isProfileComplete) &&
+            (identical(other.countdownDuration, countdownDuration) ||
+                other.countdownDuration == countdownDuration));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -260,6 +279,7 @@ class _$UserProfileImpl implements _UserProfile {
     phoneNumber,
     medicalProfile,
     isProfileComplete,
+    countdownDuration,
   );
 
   /// Create a copy of UserProfile
@@ -285,6 +305,7 @@ abstract class _UserProfile implements UserProfile {
     required final String phoneNumber,
     required final MedicalProfile medicalProfile,
     final bool isProfileComplete,
+    final int countdownDuration,
   }) = _$UserProfileImpl;
 
   factory _UserProfile.fromJson(Map<String, dynamic> json) =
@@ -304,6 +325,8 @@ abstract class _UserProfile implements UserProfile {
   MedicalProfile get medicalProfile;
   @override
   bool get isProfileComplete;
+  @override
+  int get countdownDuration;
 
   /// Create a copy of UserProfile
   /// with the given fields replaced by the non-null parameter values.

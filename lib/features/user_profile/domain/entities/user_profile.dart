@@ -1,5 +1,4 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:json_annotation/json_annotation.dart';
 import 'package:my_panic/features/panic/domain/entities/medical_profile.dart';
 
 part 'user_profile.freezed.dart';
