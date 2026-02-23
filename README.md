@@ -21,6 +21,12 @@ flutter pub get
 flutter devices
 flutter run -d MPK0222525000545
 
+flutter run -d RFCR902H1GE
+
+<!--  -->
+flutter run -d R7AWB0CBM7A
+
+
 
 Current:
 App prompts the user to send the SMS
@@ -30,8 +36,8 @@ App prompts the user to send the SMS
 Logo of app and name
 
 There's also a current issue where the app does not fetch the database info on a new device (logging in to another one)
-    So it must check remote DB then local db, if remote is empty, then local is empty, if remote has data, then local must have data
-    Even the 30 second timer was affected, and it would only sync after going to settings
-    Like it shouldn't re prompt for your info if you are logging in and already have info in the database
+    So it must check remote DB to use that data then local db must be updated. If remote is empty, then local is used (if it exists, user logged out of the app in their device, and logged in again). If both empty, then prompt user to enter info.
+    Even the 30 second timer was affected, and it would only sync to reflect the remote data after going to settings
+    Like it shouldn't re prompt for your info if you are logging in (new device or relogging in on the same device) and already have info in the database either in the cloud or local. Where cloud data is prioritized over local data.
 
 So hardcoding the status values on the home screen like the number of contacts and active location status
