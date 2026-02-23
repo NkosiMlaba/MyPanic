@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -34,13 +35,30 @@ class UserProfileRepository {
   Future<void> createUserProfile(UserProfile profile) async {
     final uid = currentUserId;
     if (uid == null) throw Exception('User not authenticated');
-    await _usersRef().doc(uid).set(profile);
+    // Use timeout so the UI doesn't hang indefinitely if offline
+    try {
+      await _usersRef()
+          .doc(uid)
+          .set(profile)
+          .timeout(const Duration(seconds: 5));
+    } catch (e) {
+      // Timeout exceptions are expected if offline, but the data is still saved
+      // to the local cache, so we can ignore the timeout here and proceed.
+      if (e is! TimeoutException) rethrow;
+    }
   }
 
   Future<void> updateUserProfile(UserProfile profile) async {
     final uid = currentUserId;
     if (uid == null) throw Exception('User not authenticated');
-    await _usersRef().doc(uid).set(profile, SetOptions(merge: true));
+    try {
+      await _usersRef()
+          .doc(uid)
+          .set(profile, SetOptions(merge: true))
+          .timeout(const Duration(seconds: 5));
+    } catch (e) {
+      if (e is! TimeoutException) rethrow;
+    }
   }
 
   Future<UserProfile?> getUserProfile() async {

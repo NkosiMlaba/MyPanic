@@ -15,6 +15,7 @@ class UserProfile with _$UserProfile {
     required String phoneNumber,
     required MedicalProfile medicalProfile,
     @Default(false) bool isProfileComplete,
+    @Default(30) int countdownDuration,
   }) = _UserProfile;
 
   factory UserProfile.fromJson(Map<String, dynamic> json) =>
