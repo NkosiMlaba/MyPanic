@@ -104,14 +104,18 @@ class _PanicButtonWidgetState extends ConsumerState<PanicButtonWidget>
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.warning_rounded, size: 64, color: Colors.white),
+                    Icon(
+                      Icons.warning_rounded,
+                      size: 64,
+                      color: AppTheme.textPrimary,
+                    ),
                     SizedBox(height: 8),
                     Text(
                       'PANIC',
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: AppTheme.textPrimary,
                         letterSpacing: 4,
                       ),
                     ),

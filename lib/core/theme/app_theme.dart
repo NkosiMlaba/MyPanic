@@ -22,6 +22,13 @@ class AppTheme {
   static const Color textSecondary = Color(0xFFB0B0B0);
   static const Color textMuted = Color(0xFF757575);
 
+  // Divider / Border Colors
+  static const Color dividerColor = Color(0x3DFFFFFF); // ~white24
+  static const Color borderSubtle = Color(0xB3FFFFFF); // ~white70
+
+  // Special Backgrounds
+  static const Color countdownBackground = Color(0xFF1A0A0A);
+
   // Status Colors
   static const Color successGreen = Color(0xFF4CAF50);
   static const Color warningYellow = Color(0xFFFFC107);

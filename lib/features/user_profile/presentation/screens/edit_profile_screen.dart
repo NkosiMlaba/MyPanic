@@ -266,7 +266,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           child: CircularProgressIndicator(color: AppTheme.primaryRed),
         ),
         error: (err, stack) => Center(
-          child: Text('Error: $err', style: const TextStyle(color: Colors.red)),
+          child: Text(
+            'Error: $err',
+            style: const TextStyle(color: AppTheme.errorRed),
+          ),
         ),
       ),
     );
@@ -275,10 +278,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   InputDecoration _inputDecoration(String label, IconData icon) {
     return InputDecoration(
       labelText: label,
-      prefixIcon: Icon(icon, color: Colors.white70),
-      labelStyle: const TextStyle(color: Colors.white70),
+      prefixIcon: Icon(icon, color: AppTheme.textSecondary),
+      labelStyle: const TextStyle(color: AppTheme.textSecondary),
       enabledBorder: const OutlineInputBorder(
-        borderSide: BorderSide(color: Colors.white24),
+        borderSide: BorderSide(color: AppTheme.dividerColor),
       ),
       focusedBorder: const OutlineInputBorder(
         borderSide: BorderSide(color: AppTheme.primaryRed),

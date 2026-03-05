@@ -115,7 +115,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                           height: 20,
                           width: 20,
                           child: CircularProgressIndicator(
-                            color: Colors.white,
+                            color: AppTheme.textPrimary,
                             strokeWidth: 2,
                           ),
                         )
@@ -138,9 +138,9 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
   InputDecoration _inputDecoration(String label) {
     return InputDecoration(
       labelText: label,
-      labelStyle: const TextStyle(color: Colors.white70),
+      labelStyle: const TextStyle(color: AppTheme.textSecondary),
       enabledBorder: const OutlineInputBorder(
-        borderSide: BorderSide(color: Colors.white24),
+        borderSide: BorderSide(color: AppTheme.dividerColor),
       ),
       focusedBorder: const OutlineInputBorder(
         borderSide: BorderSide(color: AppTheme.primaryRed),

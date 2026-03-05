@@ -89,14 +89,14 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: AppTheme.textPrimary,
               ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
             const Text(
               'We have sent a verification link to your email address. Please verify your account to continue.',
-              style: TextStyle(color: Colors.white70, fontSize: 16),
+              style: TextStyle(color: AppTheme.textSecondary, fontSize: 16),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),

@@ -31,12 +31,12 @@ class ContactsScreen extends ConsumerWidget {
                   const Icon(
                     Icons.people_outline,
                     size: 60,
-                    color: Colors.white24,
+                    color: AppTheme.dividerColor,
                   ),
                   const SizedBox(height: 16),
                   const Text(
                     'No contacts added yet.',
-                    style: TextStyle(color: Colors.white54),
+                    style: TextStyle(color: AppTheme.textMuted),
                   ),
                   const SizedBox(height: 8),
                   TextButton(
@@ -67,22 +67,25 @@ class ContactsScreen extends ConsumerWidget {
                   ),
                   title: Text(
                     contact.name,
-                    style: const TextStyle(color: Colors.white),
+                    style: const TextStyle(color: AppTheme.textPrimary),
                   ),
                   subtitle: Text(
                     '${contact.relationship} • ${contact.phone}',
-                    style: const TextStyle(color: Colors.white54),
+                    style: const TextStyle(color: AppTheme.textMuted),
                   ),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.edit, color: Colors.white54),
+                        icon: const Icon(Icons.edit, color: AppTheme.textMuted),
                         onPressed: () =>
                             _showContactDialog(context, ref, contact: contact),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.redAccent),
+                        icon: const Icon(
+                          Icons.delete,
+                          color: AppTheme.errorRed,
+                        ),
                         onPressed: () =>
                             _deleteContact(context, ref, contact.id),
                       ),
@@ -97,7 +100,10 @@ class ContactsScreen extends ConsumerWidget {
           child: CircularProgressIndicator(color: AppTheme.primaryRed),
         ),
         error: (err, stack) => Center(
-          child: Text('Error: $err', style: const TextStyle(color: Colors.red)),
+          child: Text(
+            'Error: $err',
+            style: const TextStyle(color: AppTheme.errorRed),
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
@@ -119,11 +125,11 @@ class ContactsScreen extends ConsumerWidget {
         backgroundColor: AppTheme.surfaceDark,
         title: const Text(
           'Delete Contact?',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: AppTheme.textPrimary),
         ),
         content: const Text(
           'Are you sure you want to remove this contact?',
-          style: TextStyle(color: Colors.white70),
+          style: TextStyle(color: AppTheme.textSecondary),
         ),
         actions: [
           TextButton(
@@ -132,7 +138,10 @@ class ContactsScreen extends ConsumerWidget {
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            child: const Text(
+              'Delete',
+              style: TextStyle(color: AppTheme.errorRed),
+            ),
           ),
         ],
       ),
@@ -228,7 +237,7 @@ class _ContactDialogState extends ConsumerState<_ContactDialog> {
       backgroundColor: AppTheme.surfaceDark,
       title: Text(
         widget.contact == null ? 'Add Contact' : 'Edit Contact',
-        style: const TextStyle(color: Colors.white),
+        style: const TextStyle(color: AppTheme.textPrimary),
       ),
       content: SingleChildScrollView(
         child: Form(
@@ -238,12 +247,12 @@ class _ContactDialogState extends ConsumerState<_ContactDialog> {
             children: [
               TextFormField(
                 controller: _nameCtrl,
-                style: const TextStyle(color: Colors.white),
+                style: const TextStyle(color: AppTheme.textPrimary),
                 decoration: const InputDecoration(
                   labelText: 'Name',
-                  labelStyle: TextStyle(color: Colors.white70),
+                  labelStyle: TextStyle(color: AppTheme.textSecondary),
                   enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white24),
+                    borderSide: BorderSide(color: AppTheme.dividerColor),
                   ),
                 ),
                 validator: (v) => v?.isEmpty == true ? 'Required' : null,
@@ -251,12 +260,12 @@ class _ContactDialogState extends ConsumerState<_ContactDialog> {
               const SizedBox(height: 16),
               TextFormField(
                 controller: _phoneCtrl,
-                style: const TextStyle(color: Colors.white),
+                style: const TextStyle(color: AppTheme.textPrimary),
                 decoration: const InputDecoration(
                   labelText: 'Phone Number',
-                  labelStyle: TextStyle(color: Colors.white70),
+                  labelStyle: TextStyle(color: AppTheme.textSecondary),
                   enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white24),
+                    borderSide: BorderSide(color: AppTheme.dividerColor),
                   ),
                 ),
                 keyboardType: TextInputType.phone,
@@ -265,12 +274,12 @@ class _ContactDialogState extends ConsumerState<_ContactDialog> {
               const SizedBox(height: 16),
               TextFormField(
                 controller: _relationCtrl,
-                style: const TextStyle(color: Colors.white),
+                style: const TextStyle(color: AppTheme.textPrimary),
                 decoration: const InputDecoration(
                   labelText: 'Relationship (e.g. Mom, Partner)',
-                  labelStyle: TextStyle(color: Colors.white70),
+                  labelStyle: TextStyle(color: AppTheme.textSecondary),
                   enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white24),
+                    borderSide: BorderSide(color: AppTheme.dividerColor),
                   ),
                 ),
                 validator: (v) => v?.isEmpty == true ? 'Required' : null,
@@ -292,7 +301,7 @@ class _ContactDialogState extends ConsumerState<_ContactDialog> {
                   width: 20,
                   height: 20,
                   child: CircularProgressIndicator(
-                    color: Colors.white,
+                    color: AppTheme.textPrimary,
                     strokeWidth: 2,
                   ),
                 )

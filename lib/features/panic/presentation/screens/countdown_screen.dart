@@ -29,7 +29,7 @@ class CountdownScreen extends ConsumerWidget {
     final progress = secondsRemaining / totalDuration;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF1A0A0A), // Dark red tinted background
+      backgroundColor: AppTheme.countdownBackground,
       body: SafeArea(
         child: Column(
           children: [
@@ -281,7 +281,7 @@ class _SlideToCancelState extends State<_SlideToCancel> {
                 ),
                 child: Icon(
                   _confirmed ? Icons.check : Icons.close,
-                  color: Colors.white,
+                  color: AppTheme.textPrimary,
                   size: 28,
                 ),
               ),

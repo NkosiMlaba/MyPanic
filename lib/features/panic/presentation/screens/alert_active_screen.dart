@@ -177,7 +177,7 @@ class AlertActiveScreen extends ConsumerWidget {
                                 return const Center(
                                   child: Text(
                                     'No contacts notified',
-                                    style: TextStyle(color: Colors.white54),
+                                    style: TextStyle(color: AppTheme.textMuted),
                                   ),
                                 );
                               }
@@ -206,7 +206,7 @@ class AlertActiveScreen extends ConsumerWidget {
                             ),
                             error: (_, __) => const Text(
                               'Error loading contacts',
-                              style: TextStyle(color: Colors.red),
+                              style: TextStyle(color: AppTheme.errorRed),
                             ),
                           );
                         },

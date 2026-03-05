@@ -59,8 +59,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: AppTheme.surfaceDark,
-        title: Text(title, style: const TextStyle(color: Colors.white)),
-        content: Text(message, style: const TextStyle(color: Colors.white70)),
+        title: Text(title, style: const TextStyle(color: AppTheme.textPrimary)),
+        content: Text(
+          message,
+          style: const TextStyle(color: AppTheme.textSecondary),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -90,7 +93,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'MYPanic',
+                        'MyPanic',
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -98,7 +101,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         ),
                       ),
                       Text(
-                        'Student Safety',
+                        'Smart, Connected Safety',
                         style: TextStyle(
                           fontSize: 14,
                           color: AppTheme.textSecondary,

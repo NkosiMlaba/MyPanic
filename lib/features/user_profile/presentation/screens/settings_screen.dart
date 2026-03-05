@@ -48,19 +48,22 @@ class SettingsScreen extends ConsumerWidget {
             builder: (context, ref, child) {
               final duration = ref.watch(settingsProvider);
               return ListTile(
-                leading: const Icon(Icons.timer_outlined, color: Colors.white),
+                leading: const Icon(
+                  Icons.timer_outlined,
+                  color: AppTheme.textPrimary,
+                ),
                 title: const Text(
                   'Countdown Duration',
-                  style: TextStyle(color: Colors.white, fontSize: 16),
+                  style: TextStyle(color: AppTheme.textPrimary, fontSize: 16),
                 ),
                 subtitle: const Text(
                   'Time before alert is sent',
-                  style: TextStyle(color: Colors.white54),
+                  style: TextStyle(color: AppTheme.textMuted),
                 ),
                 trailing: DropdownButton<int>(
                   value: duration,
                   dropdownColor: AppTheme.cardDark,
-                  style: const TextStyle(color: Colors.white),
+                  style: const TextStyle(color: AppTheme.textPrimary),
                   underline: const SizedBox(),
                   items: [10, 30, 60].map((int value) {
                     return DropdownMenuItem<int>(
@@ -87,7 +90,7 @@ class SettingsScreen extends ConsumerWidget {
             title: 'Change Password',
             onTap: () => context.push(AppRoutes.changePassword),
           ),
-          const Divider(color: Colors.white24, height: 32),
+          const Divider(color: AppTheme.dividerColor, height: 32),
           _buildSettingsTile(
             context,
             icon: Icons.logout,
@@ -100,11 +103,11 @@ class SettingsScreen extends ConsumerWidget {
                   backgroundColor: AppTheme.surfaceDark,
                   title: const Text(
                     'Sign Out?',
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: AppTheme.textPrimary),
                   ),
                   content: const Text(
                     'Are you sure you want to sign out?',
-                    style: TextStyle(color: Colors.white70),
+                    style: TextStyle(color: AppTheme.textSecondary),
                   ),
                   actions: [
                     TextButton(
@@ -153,7 +156,7 @@ class SettingsScreen extends ConsumerWidget {
           style: const TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: Colors.white,
+            color: AppTheme.textPrimary,
           ),
         ),
       ],
@@ -168,7 +171,7 @@ class SettingsScreen extends ConsumerWidget {
         style: const TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.bold,
-          color: Colors.white54,
+          color: AppTheme.textMuted,
           letterSpacing: 1.2,
         ),
       ),
@@ -181,15 +184,15 @@ class SettingsScreen extends ConsumerWidget {
     required String title,
     String? subtitle,
     required VoidCallback onTap,
-    Color color = Colors.white,
+    Color color = AppTheme.textPrimary,
   }) {
     return ListTile(
       leading: Icon(icon, color: color),
       title: Text(title, style: TextStyle(color: color, fontSize: 16)),
       subtitle: subtitle != null
-          ? Text(subtitle, style: const TextStyle(color: Colors.white54))
+          ? Text(subtitle, style: const TextStyle(color: AppTheme.textMuted))
           : null,
-      trailing: const Icon(Icons.chevron_right, color: Colors.white24),
+      trailing: const Icon(Icons.chevron_right, color: AppTheme.dividerColor),
       onTap: onTap,
     );
   }

@@ -88,7 +88,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: AppTheme.textPrimary,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -166,7 +166,9 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                       ? const SizedBox(
                           height: 24,
                           width: 24,
-                          child: CircularProgressIndicator(color: Colors.white),
+                          child: CircularProgressIndicator(
+                            color: AppTheme.textPrimary,
+                          ),
                         )
                       : const Text('Sign Up', style: TextStyle(fontSize: 18)),
                 ),

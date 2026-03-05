@@ -127,7 +127,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             children: [
               const Text(
                 'Help us help you in an emergency by providing your basic details.',
-                style: TextStyle(color: Colors.white70),
+                style: TextStyle(color: AppTheme.textSecondary),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 32),
@@ -199,7 +199,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
                 child: _isLoading
-                    ? const CircularProgressIndicator(color: Colors.white)
+                    ? const CircularProgressIndicator(
+                        color: AppTheme.textPrimary,
+                      )
                     : const Text(
                         'Complete Setup',
                         style: TextStyle(fontSize: 18),

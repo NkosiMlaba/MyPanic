@@ -73,7 +73,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: AppTheme.textPrimary,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -140,7 +140,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ? const SizedBox(
                           height: 24,
                           width: 24,
-                          child: CircularProgressIndicator(color: Colors.white),
+                          child: CircularProgressIndicator(
+                            color: AppTheme.textPrimary,
+                          ),
                         )
                       : const Text('Login', style: TextStyle(fontSize: 18)),
                 ),
@@ -150,7 +152,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   children: [
                     const Text(
                       "Don't have an account? ",
-                      style: TextStyle(color: Colors.white70),
+                      style: TextStyle(color: AppTheme.textSecondary),
                     ),
                     TextButton(
                       onPressed: () => context.push('/signup'),

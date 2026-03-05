@@ -81,14 +81,14 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: AppTheme.textPrimary,
                   ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 16),
                 const Text(
                   'Enter your email address and we will send you a link to reset your password.',
-                  style: TextStyle(color: Colors.white70),
+                  style: TextStyle(color: AppTheme.textSecondary),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 48),
@@ -99,16 +99,20 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                     decoration: BoxDecoration(
                       color: _isError
                           ? AppTheme.primaryRed.withValues(alpha: 0.1)
-                          : Colors.green.withValues(alpha: 0.1),
+                          : AppTheme.successGreen.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: _isError ? AppTheme.primaryRed : Colors.green,
+                        color: _isError
+                            ? AppTheme.primaryRed
+                            : AppTheme.successGreen,
                       ),
                     ),
                     child: Text(
                       _message!,
                       style: TextStyle(
-                        color: _isError ? AppTheme.primaryRed : Colors.green,
+                        color: _isError
+                            ? AppTheme.primaryRed
+                            : AppTheme.successGreen,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -138,7 +142,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                       ? const SizedBox(
                           height: 24,
                           width: 24,
-                          child: CircularProgressIndicator(color: Colors.white),
+                          child: CircularProgressIndicator(
+                            color: AppTheme.textPrimary,
+                          ),
                         )
                       : const Text(
                           'Send Reset Link',
