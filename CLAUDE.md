@@ -86,9 +86,14 @@ Requires `google-services.json` in `android/app/` for Android. `Firebase.initial
 
 ## Brand Identity (App)
 
-The app uses a **dark emergency theme** independent of the marketing brand palette:
-- Primary: `#E53935` (red)
-- Background: `#0D0D0D`
-- Surface: `#1A1A1A` / Card: `#252525`
+Logo assets live in `assets/images/` and are declared in `pubspec.yaml`:
+- `MyPanic-logo-text-normal.png` — full color logo (blush brush stroke) — used on auth screens (login, signup, forgot password)
+- `MyPanic-logo-heart.png` — hugging heart icon — used on home header, verify email, onboarding
+- `MyPanic-logo-text-monochrome.png` — black version, reserved for light backgrounds
 
-The pink brand palette (`#E58090`, `#EFB2BA`, etc.) from the Brand Guidelines is for physical product and marketing materials only — not for the app UI.
+Color strategy:
+- `AppTheme.primaryRed` is now **brand pink `#E58090`** — used for all buttons, inputs, accents, section titles
+- `AppTheme.emergencyRed = #E53935` — used **only** in `panic_button_widget.dart` (keeps the SOS button fire-engine red for urgency)
+- `AppTheme.errorRed = #F44336` — countdown and alert-active screens (unchanged semantic error color)
+- Dark backgrounds unchanged: `#0D0D0D` / `#1A1A1A` / `#252525`
+- Full brand color set: `brandPink`, `brandPinkLight`, `brandBlush`, `brandCharcoal`, `brandWarmGrey` — all on `AppTheme`

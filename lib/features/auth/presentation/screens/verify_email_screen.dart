@@ -78,11 +78,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
-              Icons.mark_email_unread_outlined,
-              size: 100,
-              color: AppTheme.primaryRed,
-            ),
+            Image.asset('assets/images/MyPanic-logo-heart.png', height: 100),
             const SizedBox(height: 24),
             const Text(
               'Verify your email',

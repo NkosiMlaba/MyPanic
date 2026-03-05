@@ -76,16 +76,21 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                Image.asset(
+                  'assets/images/MyPanic-logo-text-normal.png',
+                  height: 100,
+                ),
+                const SizedBox(height: 8),
                 const Text(
                   'Reset Password',
                   style: TextStyle(
-                    fontSize: 32,
+                    fontSize: 26,
                     fontWeight: FontWeight.bold,
                     color: AppTheme.textPrimary,
                   ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
                 const Text(
                   'Enter your email address and we will send you a link to reset your password.',
                   style: TextStyle(color: AppTheme.textSecondary),

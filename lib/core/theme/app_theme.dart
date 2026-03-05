@@ -7,9 +7,21 @@ library;
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  // Brand Colors
-  static const Color primaryRed = Color(0xFFE53935);
-  static const Color darkRed = Color(0xFFB71C1C);
+  // Brand Colors (from Brand Guidelines — MyPanic Brand Guidelines Presentation.pdf)
+  static const Color brandPink = Color(0xFFE58090);        // Primary brand pink
+  static const Color brandPinkLight = Color(0xFFEFB2BA);   // Light pink
+  static const Color brandBlush = Color(0xFFFEEEEE);       // Blush background
+  static const Color brandCharcoal = Color(0xFF605757);    // Dark text / tagline
+  static const Color brandWarmGrey = Color(0xFFA69D9C);    // Warm neutral
+
+  // Primary — uses brand pink
+  static const Color primaryRed = brandPink;
+  static const Color darkRed = Color(0xFFC45C70);          // Darkened brand pink for gradients
+
+  // Emergency red — explicit use only on countdown / alert-active screens
+  static const Color emergencyRed = Color(0xFFE53935);
+  static const Color emergencyDarkRed = Color(0xFFB71C1C);
+
   static const Color accentOrange = Color(0xFFFF6F00);
 
   // Background Colors

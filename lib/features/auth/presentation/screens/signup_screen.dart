@@ -83,16 +83,21 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                Image.asset(
+                  'assets/images/MyPanic-logo-text-normal.png',
+                  height: 110,
+                ),
+                const SizedBox(height: 8),
                 const Text(
                   'Create Account',
                   style: TextStyle(
-                    fontSize: 32,
+                    fontSize: 26,
                     fontWeight: FontWeight.bold,
                     color: AppTheme.textPrimary,
                   ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 48),
+                const SizedBox(height: 36),
                 if (_errorMessage != null)
                   Container(
                     padding: const EdgeInsets.all(12),

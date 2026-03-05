@@ -66,18 +66,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Icon(Icons.shield, size: 80, color: AppTheme.primaryRed),
-                const SizedBox(height: 24),
+                Image.asset(
+                  'assets/images/MyPanic-logo-text-normal.png',
+                  height: 130,
+                ),
+                const SizedBox(height: 8),
                 const Text(
                   'Welcome Back',
                   style: TextStyle(
-                    fontSize: 32,
+                    fontSize: 26,
                     fontWeight: FontWeight.bold,
                     color: AppTheme.textPrimary,
                   ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 48),
+                const SizedBox(height: 36),
                 if (_errorMessage != null)
                   Container(
                     padding: const EdgeInsets.all(12),

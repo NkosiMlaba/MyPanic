@@ -125,12 +125,19 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              Center(
+                child: Image.asset(
+                  'assets/images/MyPanic-logo-heart.png',
+                  height: 80,
+                ),
+              ),
+              const SizedBox(height: 16),
               const Text(
                 'Help us help you in an emergency by providing your basic details.',
                 style: TextStyle(color: AppTheme.textSecondary),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 24),
 
               _buildSectionTitle('Personal Info'),
               const SizedBox(height: 16),

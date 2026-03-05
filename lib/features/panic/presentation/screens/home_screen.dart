@@ -89,23 +89,32 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  Row(
                     children: [
-                      Text(
-                        'MyPanic',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: AppTheme.textPrimary,
-                        ),
+                      Image.asset(
+                        'assets/images/MyPanic-logo-heart.png',
+                        height: 36,
                       ),
-                      Text(
-                        'Smart, Connected Safety',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: AppTheme.textSecondary,
-                        ),
+                      const SizedBox(width: 10),
+                      const Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'MyPanic',
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: AppTheme.textPrimary,
+                            ),
+                          ),
+                          Text(
+                            'Stay Loud. Stay Safe.',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: AppTheme.brandPink,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),

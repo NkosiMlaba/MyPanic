@@ -69,7 +69,7 @@ class _PanicButtonWidgetState extends ConsumerState<PanicButtonWidget>
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: AppTheme.primaryRed.withValues(alpha: 0.3),
+                  color: AppTheme.emergencyRed.withValues(alpha: 0.3),
                   blurRadius: 30,
                   spreadRadius: 10,
                 ),
@@ -85,18 +85,18 @@ class _PanicButtonWidgetState extends ConsumerState<PanicButtonWidget>
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: const RadialGradient(
-                  colors: [AppTheme.primaryRed, AppTheme.darkRed],
+                  colors: [AppTheme.emergencyRed, AppTheme.emergencyDarkRed],
                   center: Alignment(-0.2, -0.2),
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: AppTheme.darkRed.withValues(alpha: 0.5),
+                    color: AppTheme.emergencyDarkRed.withValues(alpha: 0.5),
                     blurRadius: 20,
                     offset: const Offset(0, 10),
                   ),
                 ],
                 border: Border.all(
-                  color: AppTheme.primaryRed.withValues(alpha: 0.8),
+                  color: AppTheme.emergencyRed.withValues(alpha: 0.8),
                   width: 3,
                 ),
               ),
