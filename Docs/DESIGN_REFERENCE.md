@@ -11,8 +11,18 @@
 
 ## Logo & App Icon
 
-- Default launcher icon is included in Android/iOS assets (`ic_launcher.png` / `AppIcon`)
-- No custom SVG/vector logo asset found in project — logo treatment is text-based in current build
+The official logo consists of three elements stacked vertically:
+1. **Hugging Heart icon** — a heart shape (light pink `#EFB2BA`) with a darker pink (`#E58090`) curved embrace element at the bottom, symbolising protection and emotional support for GBV survivors
+2. **"MyPanic" wordmark** — bold sans-serif in primary pink (`#E58090`), conveying urgency and personal ownership
+3. **Tagline** — "STAY LOUD. STAY SAFE." in small-caps, dark charcoal (`#605757`)
+
+Vector logo: `Docs/logo.svg`
+App launcher icon (`ic_launcher.png` / `AppIcon`) is in the platform asset directories.
+
+### Logo Usage Rules
+- Keep upright — do not rotate
+- Maintain 3:4 aspect proportion — do not stretch or squash
+- Place on solid or neutral background only
 
 ---
 
@@ -49,9 +59,21 @@
 
 ---
 
+### Brand / Marketing Color Palette (from Brand Guidelines)
+
+These colors apply to the physical product, social media, and marketing materials — **not** the app UI.
+
+| Role | Hex | Description |
+|---|---|---|
+| Warm Grey | `#A69D9C` | Neutral tone |
+| Dark Charcoal | `#605757` | Text / tagline |
+| Blush Background | `#FEEEE` | Page / card background |
+| Light Pink | `#EFB2BA` | Heart icon, soft accents |
+| Primary Pink | `#E58090` | Logo wordmark, primary brand color |
+
 ### Proposal / Presentation Color Palette (PowerPoint theme2.xml)
 
-These are the brand colors used in the pitch deck and marketing materials:
+These are the colors used in the original pitch deck:
 
 | Role | Hex | Swatch |
 |---|---|---|
@@ -66,7 +88,18 @@ These are the brand colors used in the pitch deck and marketing materials:
 
 ---
 
-## Typography (App)
+## Typography
+
+### Brand Typefaces (Marketing / Physical Product)
+
+| Role | Font | Notes |
+|---|---|---|
+| Primary | **Inter** | Clean, modern sans-serif for all digital and print |
+| Secondary | **Poppins** | Geometric sans-serif for headings and pull quotes |
+
+Use font family variants when primary fonts don't suit the content.
+
+### Typography (App)
 
 The app uses Material3 default typography. Key scale from `app_theme.dart`:
 
@@ -108,7 +141,20 @@ The app uses Material3 default typography. Key scale from `app_theme.dart`:
 
 ---
 
+## About the Brand
+
+MyPanic exists at the intersection of preparedness and empowerment. The brand embodies **durability, clarity, and action** — safety should be easy, accessible, and backed by compassion.
+
+Paired with the **Isibani Foundation**, MyPanic addresses gender-based violence (GBV), mental health, and community wellness through workshops, online resources, and support networks.
+
+**Brand voice:** Bold, supportive, relentlessly dedicated to creating environments where everyone feels safe.
+
+---
+
 ## Product Overview
+
+### MyPanic Whistle Keychain (Physical Product)
+A compact silicone whistle keychain — fully mechanical, waterproof, shock-resistant, and durable. Works instantly without charging. Suitable for students, professionals, children, and the elderly.
 
 ### MyPanic App
 A dark-first, high-contrast mobile app (Flutter — Android & iOS) providing:
@@ -190,9 +236,23 @@ Partnering with local establishments to create verified safe havens.
 
 ---
 
+---
+
+## Contact
+
+| Channel | Handle / Address |
+|---|---|
+| Email | mypanic1@gmail.com |
+| Facebook | MyPanic Enactus |
+| Instagram | my_panic |
+| TikTok | MyPanic |
+
+---
+
 ## Document History
 
 | Version | Date | Notes |
 |---|---|---|
 | v1 | January 2026 | Product Definition & Scope (initial) |
 | — | 2026 | Pitch deck: *MyPanic Proposal.pptx* |
+| v2 | March 2026 | Updated with Brand Guidelines PDF: official logo, brand color palette, typefaces (Inter/Poppins), contact info, product scope (physical whistle + Isibani Foundation) |
