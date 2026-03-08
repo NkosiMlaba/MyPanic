@@ -34,11 +34,11 @@ dart run build_runner build --delete-conflicting-outputs
 
 
 Current:
-App prompts the user to send the SMS
+<!-- App prompts the user to send the SMS -->
     Can we do whatsapp instead? Or have SMS and whatsapp as options?
     Alternatively have the in app notifications, (which might require a paring thing either QR code or paring code)
+<!-- Logo of app and name -->
 
-Logo of app and name
-
+Change the in app name from small letters
 So hardcoding the status values on the home screen like the number of contacts and active location status
 
