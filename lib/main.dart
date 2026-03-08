@@ -32,9 +32,9 @@ void main() async {
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.light,
-      systemNavigationBarColor: AppTheme.backgroundDark,
-      systemNavigationBarIconBrightness: Brightness.light,
+      statusBarIconBrightness: Brightness.dark,
+      systemNavigationBarColor: AppTheme.backgroundBrand,
+      systemNavigationBarIconBrightness: Brightness.dark,
     ),
   );
 
@@ -54,7 +54,7 @@ class MyPanicApp extends ConsumerWidget {
     return MaterialApp.router(
       title: 'MYPanic',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.darkTheme,
+      theme: AppTheme.brandTheme,
       routerConfig: router,
     );
   }

@@ -58,7 +58,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.backgroundDark,
+      backgroundColor: AppTheme.backgroundBrand,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -86,29 +86,29 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                   style: TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.bold,
-                    color: AppTheme.textPrimary,
+                    color: AppTheme.textBrandPrimary,
                   ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 12),
                 const Text(
                   'Enter your email address and we will send you a link to reset your password.',
-                  style: TextStyle(color: AppTheme.textSecondary),
+                  style: TextStyle(color: AppTheme.textBrandSecondary),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 48),
+                const SizedBox(height: 32),
                 if (_message != null)
                   Container(
                     padding: const EdgeInsets.all(12),
                     margin: const EdgeInsets.only(bottom: 16),
                     decoration: BoxDecoration(
                       color: _isError
-                          ? AppTheme.primaryRed.withValues(alpha: 0.1)
+                          ? AppTheme.brandPink.withValues(alpha: 0.1)
                           : AppTheme.successGreen.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
                         color: _isError
-                            ? AppTheme.primaryRed
+                            ? AppTheme.brandPink
                             : AppTheme.successGreen,
                       ),
                     ),
@@ -116,7 +116,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                       _message!,
                       style: TextStyle(
                         color: _isError
-                            ? AppTheme.primaryRed
+                            ? AppTheme.brandPink
                             : AppTheme.successGreen,
                       ),
                       textAlign: TextAlign.center,
@@ -139,22 +139,16 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                 const SizedBox(height: 24),
                 ElevatedButton(
                   onPressed: _isLoading ? null : _resetPassword,
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    backgroundColor: AppTheme.primaryRed,
-                  ),
                   child: _isLoading
                       ? const SizedBox(
                           height: 24,
                           width: 24,
                           child: CircularProgressIndicator(
-                            color: AppTheme.textPrimary,
+                            color: Colors.white,
+                            strokeWidth: 2,
                           ),
                         )
-                      : const Text(
-                          'Send Reset Link',
-                          style: TextStyle(fontSize: 18),
-                        ),
+                      : const Text('Send Reset Link'),
                 ),
               ],
             ),

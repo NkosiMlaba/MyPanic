@@ -17,7 +17,6 @@ class EditProfileScreen extends ConsumerStatefulWidget {
 class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  // Controllers
   late TextEditingController _firstNameController;
   late TextEditingController _lastNameController;
   late TextEditingController _phoneController;
@@ -29,11 +28,11 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   late TextEditingController _insuranceInfoController;
 
   bool _isLoading = false;
+  bool _isInitialized = false;
 
   @override
   void initState() {
     super.initState();
-    // Initialize with empty, will populate in didChangeDependencies or use Consumer in build
     _firstNameController = TextEditingController();
     _lastNameController = TextEditingController();
     _phoneController = TextEditingController();
@@ -58,8 +57,6 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     _insuranceInfoController.dispose();
     super.dispose();
   }
-
-  bool _isInitialized = false;
 
   void _initializeControllers(UserProfile? profile) {
     if (_isInitialized || profile == null) return;
@@ -92,27 +89,11 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
       final medicalProfile = MedicalProfile(
         bloodType: _bloodTypeController.text.trim(),
-        allergies: _allergiesController.text
-            .trim()
-            .split(',')
-            .map((e) => e.trim())
-            .where((e) => e.isNotEmpty)
-            .toList(),
-        conditions: _conditionsController.text
-            .trim()
-            .split(',')
-            .map((e) => e.trim())
-            .where((e) => e.isNotEmpty)
-            .toList(),
-        medications: _medicationsController.text
-            .trim()
-            .split(',')
-            .map((e) => e.trim())
-            .where((e) => e.isNotEmpty)
-            .toList(),
+        allergies: _allergiesController.text.trim().split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList(),
+        conditions: _conditionsController.text.trim().split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList(),
+        medications: _medicationsController.text.trim().split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList(),
         emergencyNotes: _emergencyNotesController.text.trim(),
         insuranceInfo: _insuranceInfoController.text.trim(),
-        // Preserve doctor info if it existed, or add fields for it later
         doctorName: currentProfile?.medicalProfile.doctorName,
         doctorPhone: currentProfile?.medicalProfile.doctorPhone,
       );
@@ -151,7 +132,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     final userProfileAsync = ref.watch(userProfileProvider);
 
     return Scaffold(
-      backgroundColor: AppTheme.backgroundDark,
+      backgroundColor: AppTheme.backgroundBrand,
       appBar: AppBar(
         title: const Text('Edit Profile'),
         backgroundColor: Colors.transparent,
@@ -166,8 +147,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       body: userProfileAsync.when(
         data: (profile) {
           _initializeControllers(profile);
-          if (profile == null)
+          if (profile == null) {
             return const Center(child: Text('Profile not found'));
+          }
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
@@ -180,27 +162,27 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   const SizedBox(height: 16),
                   TextFormField(
                     controller: _firstNameController,
-                    decoration: _inputDecoration(
-                      'First Name',
-                      Icons.person_outline,
+                    decoration: const InputDecoration(
+                      labelText: 'First Name',
+                      prefixIcon: Icon(Icons.person_outline),
                     ),
                     validator: (v) => v?.isEmpty == true ? 'Required' : null,
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
                     controller: _lastNameController,
-                    decoration: _inputDecoration(
-                      'Last Name',
-                      Icons.person_outline,
+                    decoration: const InputDecoration(
+                      labelText: 'Last Name',
+                      prefixIcon: Icon(Icons.person_outline),
                     ),
                     validator: (v) => v?.isEmpty == true ? 'Required' : null,
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
                     controller: _phoneController,
-                    decoration: _inputDecoration(
-                      'Phone Number',
-                      Icons.phone_outlined,
+                    decoration: const InputDecoration(
+                      labelText: 'Phone Number',
+                      prefixIcon: Icon(Icons.phone_outlined),
                     ),
                     keyboardType: TextInputType.phone,
                     validator: (v) => v?.isEmpty == true ? 'Required' : null,
@@ -211,49 +193,49 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   const SizedBox(height: 16),
                   TextFormField(
                     controller: _bloodTypeController,
-                    decoration: _inputDecoration(
-                      'Blood Type',
-                      Icons.bloodtype_outlined,
+                    decoration: const InputDecoration(
+                      labelText: 'Blood Type',
+                      prefixIcon: Icon(Icons.bloodtype_outlined),
                     ),
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
                     controller: _allergiesController,
-                    decoration: _inputDecoration(
-                      'Allergies (comma separated)',
-                      Icons.warning_amber_rounded,
+                    decoration: const InputDecoration(
+                      labelText: 'Allergies (comma separated)',
+                      prefixIcon: Icon(Icons.warning_amber_rounded),
                     ),
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
                     controller: _conditionsController,
-                    decoration: _inputDecoration(
-                      'Conditions (comma separated)',
-                      Icons.medical_services_outlined,
+                    decoration: const InputDecoration(
+                      labelText: 'Conditions (comma separated)',
+                      prefixIcon: Icon(Icons.medical_services_outlined),
                     ),
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
                     controller: _medicationsController,
-                    decoration: _inputDecoration(
-                      'Medications (comma separated)',
-                      Icons.medication_outlined,
+                    decoration: const InputDecoration(
+                      labelText: 'Medications (comma separated)',
+                      prefixIcon: Icon(Icons.medication_outlined),
                     ),
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
                     controller: _insuranceInfoController,
-                    decoration: _inputDecoration(
-                      'Insurance Info',
-                      Icons.verified_user_outlined,
+                    decoration: const InputDecoration(
+                      labelText: 'Insurance Info',
+                      prefixIcon: Icon(Icons.verified_user_outlined),
                     ),
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
                     controller: _emergencyNotesController,
-                    decoration: _inputDecoration(
-                      'Emergency Notes',
-                      Icons.note_outlined,
+                    decoration: const InputDecoration(
+                      labelText: 'Emergency Notes',
+                      prefixIcon: Icon(Icons.note_outlined),
                     ),
                     maxLines: 3,
                   ),
@@ -263,7 +245,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           );
         },
         loading: () => const Center(
-          child: CircularProgressIndicator(color: AppTheme.primaryRed),
+          child: CircularProgressIndicator(color: AppTheme.brandPink),
         ),
         error: (err, stack) => Center(
           child: Text(
@@ -275,27 +257,13 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     );
   }
 
-  InputDecoration _inputDecoration(String label, IconData icon) {
-    return InputDecoration(
-      labelText: label,
-      prefixIcon: Icon(icon, color: AppTheme.textSecondary),
-      labelStyle: const TextStyle(color: AppTheme.textSecondary),
-      enabledBorder: const OutlineInputBorder(
-        borderSide: BorderSide(color: AppTheme.dividerColor),
-      ),
-      focusedBorder: const OutlineInputBorder(
-        borderSide: BorderSide(color: AppTheme.primaryRed),
-      ),
-    );
-  }
-
   Widget _buildSectionTitle(String title) {
     return Text(
       title,
       style: const TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.bold,
-        color: AppTheme.primaryRed,
+        color: AppTheme.brandPink,
       ),
     );
   }

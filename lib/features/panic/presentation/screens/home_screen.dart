@@ -31,7 +31,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Future<void> _checkLocationStatus() async {
     final locationService = ref.read(locationServiceProvider);
 
-    // Check service status
     final serviceEnabled = await locationService.isServiceEnabled();
     if (!serviceEnabled && mounted) {
       _showLocationDialog(
@@ -41,7 +40,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       return;
     }
 
-    // Check permissions
     final hasPermission = await locationService.hasPermission();
     if (!hasPermission && mounted) {
       final request = await locationService.requestPermission();
@@ -58,11 +56,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: AppTheme.surfaceDark,
-        title: Text(title, style: const TextStyle(color: AppTheme.textPrimary)),
+        backgroundColor: AppTheme.surfaceBrand,
+        title: Text(title, style: const TextStyle(color: AppTheme.textBrandPrimary)),
         content: Text(
           message,
-          style: const TextStyle(color: AppTheme.textSecondary),
+          style: const TextStyle(color: AppTheme.textBrandSecondary),
         ),
         actions: [
           TextButton(
@@ -79,7 +77,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final panicState = ref.watch(panicNotifierProvider);
 
     return Scaffold(
-      backgroundColor: AppTheme.backgroundDark,
+      backgroundColor: AppTheme.backgroundBrand,
       body: SafeArea(
         child: Column(
           children: [
@@ -104,7 +102,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             style: TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
-                              color: AppTheme.textPrimary,
+                              color: AppTheme.textBrandPrimary,
                             ),
                           ),
                           Text(
@@ -124,7 +122,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       const SizedBox(width: 12),
                       IconButton(
                         icon: const Icon(Icons.settings_outlined),
-                        color: AppTheme.textSecondary,
+                        color: AppTheme.textBrandSecondary,
                         onPressed: () {
                           context.push(AppRoutes.settings);
                         },
@@ -141,15 +139,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppTheme.cardDark,
+                  color: AppTheme.cardBrand,
                   borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppTheme.dividerBrand),
                 ),
                 child: Row(
                   children: [
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: AppTheme.successGreen.withValues(alpha: 0.2),
+                        color: AppTheme.successGreen.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Icon(
@@ -168,14 +167,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
-                              color: AppTheme.textPrimary,
+                              color: AppTheme.textBrandPrimary,
                             ),
                           ),
                           Text(
                             'Press the button below in case of emergency',
                             style: TextStyle(
                               fontSize: 13,
-                              color: AppTheme.textSecondary,
+                              color: AppTheme.textBrandSecondary,
                             ),
                           ),
                         ],
@@ -213,7 +212,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     '30 second countdown before alert is sent',
                     style: TextStyle(
                       fontSize: 12,
-                      color: AppTheme.textMuted.withValues(alpha: 0.7),
+                      color: AppTheme.textBrandMuted,
                     ),
                   ),
                 ],
@@ -227,12 +226,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Widget _buildStatusIndicator(PanicState state) {
     return state.when(
-      idle: () => _statusDot(AppTheme.textMuted, 'Idle'),
+      idle: () => _statusDot(AppTheme.textBrandMuted, 'Idle'),
       armed: () => _statusDot(AppTheme.successGreen, 'Ready'),
       countingDown: (_, _) => _statusDot(AppTheme.warningYellow, 'Counting'),
-      active: (_, _) => _statusDot(AppTheme.errorRed, 'Active'),
+      active: (_, _) => _statusDot(AppTheme.emergencyRed, 'Active'),
       cancelled: (_) => _statusDot(AppTheme.infoBlue, 'Cancelled'),
-      error: (_, _) => _statusDot(AppTheme.errorRed, 'Error'),
+      error: (_, _) => _statusDot(AppTheme.emergencyRed, 'Error'),
     );
   }
 
@@ -240,8 +239,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.2),
+        color: color.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -257,7 +257,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             style: TextStyle(
               fontSize: 12,
               color: color,
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ],
@@ -269,18 +269,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: AppTheme.surfaceDark,
+        color: AppTheme.surfaceBrand,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppTheme.cardDark, width: 1),
+        border: Border.all(color: AppTheme.dividerBrand),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 16, color: AppTheme.textSecondary),
+          Icon(icon, size: 16, color: AppTheme.textBrandSecondary),
           const SizedBox(width: 6),
           Text(
             label,
-            style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary),
+            style: const TextStyle(
+              fontSize: 12,
+              color: AppTheme.textBrandSecondary,
+            ),
           ),
         ],
       ),

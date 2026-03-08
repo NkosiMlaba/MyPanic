@@ -21,12 +21,10 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
     super.initState();
 
     final user = ref.read(authRepositoryProvider).currentUser;
-    // Send verification email strictly if not already verified
     if (user != null && !user.emailVerified) {
       user.sendEmailVerification();
     }
 
-    // Periodically check if email is verified
     _timer = Timer.periodic(
       const Duration(seconds: 3),
       (_) => _checkEmailVerified(),
@@ -44,11 +42,10 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
     final user = authRepo.currentUser;
 
     if (user != null) {
-      await user.reload(); // Refresh user data
+      await user.reload();
       if (user.emailVerified) {
         _timer?.cancel();
         if (mounted) {
-          // Force a refresh of the auth state so the router picks up the change
           ref.invalidate(authNotifierProvider);
         }
       }
@@ -72,7 +69,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.backgroundDark,
+      backgroundColor: AppTheme.backgroundBrand,
       body: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
@@ -85,26 +82,23 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: AppTheme.textPrimary,
+                color: AppTheme.textBrandPrimary,
               ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
             const Text(
               'We have sent a verification link to your email address. Please verify your account to continue.',
-              style: TextStyle(color: AppTheme.textSecondary, fontSize: 16),
+              style: TextStyle(color: AppTheme.textBrandSecondary, fontSize: 16),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
-            const CircularProgressIndicator(color: AppTheme.primaryRed),
+            const CircularProgressIndicator(color: AppTheme.brandPink),
             const SizedBox(height: 24),
             ElevatedButton.icon(
               onPressed: _canResendEmail ? _resendVerificationEmail : null,
               icon: const Icon(Icons.email),
               label: const Text('Resend Email'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.primaryRed,
-              ),
             ),
             const SizedBox(height: 16),
             TextButton(

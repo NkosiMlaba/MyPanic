@@ -19,8 +19,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
   final _phoneController = TextEditingController();
-
-  // Medical Info Controllers (Simplified for onboarding)
   final _bloodTypeController = TextEditingController();
   final _allergiesController = TextEditingController();
   final _conditionsController = TextEditingController();
@@ -66,7 +64,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             .split(',')
             .map((e) => e.trim())
             .toList(),
-        insuranceInfo: '', // Can be added in settings later
+        insuranceInfo: '',
         emergencyNotes: '',
       );
 
@@ -80,24 +78,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         isProfileComplete: true,
       );
 
-      debugPrint('Creating UserProfile:');
-      debugPrint('UID: ${user.uid}');
-      debugPrint('Email: ${user.email}');
-      debugPrint(
-        'Name: ${_firstNameController.text} ${_lastNameController.text}',
-      );
-      debugPrint('Phone: ${_phoneController.text}');
-      debugPrint('Medical: $medicalProfile');
-
       await ref.read(userProfileRepositoryProvider).createUserProfile(profile);
-
-      // Router should pick up the change in profile stream or we force refresh
-      if (mounted) {
-        // Force router refresh if needed, but the router should act on the stream
-      }
     } catch (e, st) {
-      debugPrint('Error saving profile: $e');
-      debugPrint('Stack trace: $st');
+      debugPrint('Error saving profile: $e\n$st');
       if (mounted) {
         ScaffoldMessenger.of(
           context,
@@ -111,7 +94,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.backgroundDark,
+      backgroundColor: AppTheme.backgroundBrand,
       appBar: AppBar(
         title: const Text('Setup Your Profile'),
         backgroundColor: Colors.transparent,
@@ -134,7 +117,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               const SizedBox(height: 16),
               const Text(
                 'Help us help you in an emergency by providing your basic details.',
-                style: TextStyle(color: AppTheme.textSecondary),
+                style: TextStyle(color: AppTheme.textBrandSecondary),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 24),
@@ -201,18 +184,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               const SizedBox(height: 48),
               ElevatedButton(
                 onPressed: _isLoading ? null : _saveProfile,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.primaryRed,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                ),
                 child: _isLoading
-                    ? const CircularProgressIndicator(
-                        color: AppTheme.textPrimary,
-                      )
-                    : const Text(
-                        'Complete Setup',
-                        style: TextStyle(fontSize: 18),
-                      ),
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Text('Complete Setup'),
               ),
             ],
           ),
@@ -227,7 +201,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       style: const TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.bold,
-        color: AppTheme.primaryRed,
+        color: AppTheme.brandPink,
       ),
     );
   }

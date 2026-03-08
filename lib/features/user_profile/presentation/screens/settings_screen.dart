@@ -15,7 +15,7 @@ class SettingsScreen extends ConsumerWidget {
     final userProfile = ref.watch(userProfileProvider).valueOrNull;
 
     return Scaffold(
-      backgroundColor: AppTheme.backgroundDark,
+      backgroundColor: AppTheme.backgroundBrand,
       appBar: AppBar(
         title: const Text('Settings'),
         backgroundColor: Colors.transparent,
@@ -48,22 +48,16 @@ class SettingsScreen extends ConsumerWidget {
             builder: (context, ref, child) {
               final duration = ref.watch(settingsProvider);
               return ListTile(
-                leading: const Icon(
-                  Icons.timer_outlined,
-                  color: AppTheme.textPrimary,
-                ),
-                title: const Text(
-                  'Countdown Duration',
-                  style: TextStyle(color: AppTheme.textPrimary, fontSize: 16),
-                ),
+                leading: const Icon(Icons.timer_outlined),
+                title: const Text('Countdown Duration', style: TextStyle(fontSize: 16)),
                 subtitle: const Text(
                   'Time before alert is sent',
-                  style: TextStyle(color: AppTheme.textMuted),
+                  style: TextStyle(color: AppTheme.textBrandSecondary),
                 ),
                 trailing: DropdownButton<int>(
                   value: duration,
-                  dropdownColor: AppTheme.cardDark,
-                  style: const TextStyle(color: AppTheme.textPrimary),
+                  dropdownColor: AppTheme.surfaceBrand,
+                  style: const TextStyle(color: AppTheme.textBrandPrimary),
                   underline: const SizedBox(),
                   items: [10, 30, 60].map((int value) {
                     return DropdownMenuItem<int>(
@@ -90,24 +84,24 @@ class SettingsScreen extends ConsumerWidget {
             title: 'Change Password',
             onTap: () => context.push(AppRoutes.changePassword),
           ),
-          const Divider(color: AppTheme.dividerColor, height: 32),
+          const Divider(color: AppTheme.dividerBrand, height: 32),
           _buildSettingsTile(
             context,
             icon: Icons.logout,
             title: 'Sign Out',
-            color: AppTheme.primaryRed,
+            color: AppTheme.brandPink,
             onTap: () async {
               final shouldLogout = await showDialog<bool>(
                 context: context,
                 builder: (context) => AlertDialog(
-                  backgroundColor: AppTheme.surfaceDark,
+                  backgroundColor: AppTheme.surfaceBrand,
                   title: const Text(
                     'Sign Out?',
-                    style: TextStyle(color: AppTheme.textPrimary),
+                    style: TextStyle(color: AppTheme.textBrandPrimary),
                   ),
                   content: const Text(
                     'Are you sure you want to sign out?',
-                    style: TextStyle(color: AppTheme.textSecondary),
+                    style: TextStyle(color: AppTheme.textBrandSecondary),
                   ),
                   actions: [
                     TextButton(
@@ -118,7 +112,7 @@ class SettingsScreen extends ConsumerWidget {
                       onPressed: () => Navigator.pop(context, true),
                       child: const Text(
                         'Sign Out',
-                        style: TextStyle(color: AppTheme.primaryRed),
+                        style: TextStyle(color: AppTheme.brandPink),
                       ),
                     ),
                   ],
@@ -138,15 +132,16 @@ class SettingsScreen extends ConsumerWidget {
   Widget _buildProfileHeader(String firstName, String lastName) {
     return Column(
       children: [
+        const SizedBox(height: 16),
         CircleAvatar(
           radius: 40,
-          backgroundColor: AppTheme.surfaceDark,
+          backgroundColor: AppTheme.brandPinkLight,
           child: Text(
             firstName.isNotEmpty ? firstName[0].toUpperCase() : '?',
             style: const TextStyle(
               fontSize: 32,
               fontWeight: FontWeight.bold,
-              color: AppTheme.primaryRed,
+              color: AppTheme.brandPink,
             ),
           ),
         ),
@@ -156,7 +151,7 @@ class SettingsScreen extends ConsumerWidget {
           style: const TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: AppTheme.textPrimary,
+            color: AppTheme.textBrandPrimary,
           ),
         ),
       ],
@@ -171,7 +166,7 @@ class SettingsScreen extends ConsumerWidget {
         style: const TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.bold,
-          color: AppTheme.textMuted,
+          color: AppTheme.textBrandMuted,
           letterSpacing: 1.2,
         ),
       ),
@@ -184,15 +179,15 @@ class SettingsScreen extends ConsumerWidget {
     required String title,
     String? subtitle,
     required VoidCallback onTap,
-    Color color = AppTheme.textPrimary,
+    Color color = AppTheme.textBrandPrimary,
   }) {
     return ListTile(
       leading: Icon(icon, color: color),
       title: Text(title, style: TextStyle(color: color, fontSize: 16)),
       subtitle: subtitle != null
-          ? Text(subtitle, style: const TextStyle(color: AppTheme.textMuted))
+          ? Text(subtitle, style: const TextStyle(color: AppTheme.textBrandSecondary))
           : null,
-      trailing: const Icon(Icons.chevron_right, color: AppTheme.dividerColor),
+      trailing: Icon(Icons.chevron_right, color: AppTheme.dividerBrand),
       onTap: onTap,
     );
   }

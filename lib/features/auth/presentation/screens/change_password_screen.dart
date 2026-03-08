@@ -33,12 +33,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
 
     try {
       final authRepo = ref.read(authRepositoryProvider);
-
-      // Re-authenticate (required for sensitive operations)
-      // Note: This requires the user to know their current password.
-      // If they forgot, they should use ForgotPassword flow.
       await authRepo.reauthenticate(_currentPasswordController.text.trim());
-
       await authRepo.updatePassword(_newPasswordController.text.trim());
 
       if (mounted) {
@@ -61,7 +56,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.backgroundDark,
+      backgroundColor: AppTheme.backgroundBrand,
       appBar: AppBar(
         title: const Text('Change Password'),
         backgroundColor: Colors.transparent,
@@ -76,21 +71,21 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
               TextFormField(
                 controller: _currentPasswordController,
                 obscureText: true,
-                decoration: _inputDecoration('Current Password'),
+                decoration: const InputDecoration(labelText: 'Current Password'),
                 validator: (v) => v?.isEmpty == true ? 'Required' : null,
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _newPasswordController,
                 obscureText: true,
-                decoration: _inputDecoration('New Password'),
+                decoration: const InputDecoration(labelText: 'New Password'),
                 validator: (v) => (v?.length ?? 0) < 6 ? 'Min 6 chars' : null,
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _confirmPasswordController,
                 obscureText: true,
-                decoration: _inputDecoration('Confirm New Password'),
+                decoration: const InputDecoration(labelText: 'Confirm New Password'),
                 validator: (v) {
                   if (v != _newPasswordController.text) {
                     return 'Passwords do not match';
@@ -103,53 +98,21 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _changePassword,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.primaryRed,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
                   child: _isLoading
                       ? const SizedBox(
                           height: 20,
                           width: 20,
                           child: CircularProgressIndicator(
-                            color: AppTheme.textPrimary,
+                            color: Colors.white,
                             strokeWidth: 2,
                           ),
                         )
-                      : const Text(
-                          'Update Password',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                      : const Text('Update Password'),
                 ),
               ),
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  InputDecoration _inputDecoration(String label) {
-    return InputDecoration(
-      labelText: label,
-      labelStyle: const TextStyle(color: AppTheme.textSecondary),
-      enabledBorder: const OutlineInputBorder(
-        borderSide: BorderSide(color: AppTheme.dividerColor),
-      ),
-      focusedBorder: const OutlineInputBorder(
-        borderSide: BorderSide(color: AppTheme.primaryRed),
-      ),
-      errorBorder: const OutlineInputBorder(
-        borderSide: BorderSide(color: AppTheme.errorRed),
-      ),
-      focusedErrorBorder: const OutlineInputBorder(
-        borderSide: BorderSide(color: AppTheme.errorRed),
       ),
     );
   }

@@ -15,7 +15,7 @@ class ContactsScreen extends ConsumerWidget {
     final contactsAsync = ref.watch(contactsListProvider);
 
     return Scaffold(
-      backgroundColor: AppTheme.backgroundDark,
+      backgroundColor: AppTheme.backgroundBrand,
       appBar: AppBar(
         title: const Text('Emergency Contacts'),
         backgroundColor: Colors.transparent,
@@ -28,15 +28,15 @@ class ContactsScreen extends ConsumerWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.people_outline,
                     size: 60,
-                    color: AppTheme.dividerColor,
+                    color: AppTheme.dividerBrand,
                   ),
                   const SizedBox(height: 16),
                   const Text(
                     'No contacts added yet.',
-                    style: TextStyle(color: AppTheme.textMuted),
+                    style: TextStyle(color: AppTheme.textBrandMuted),
                   ),
                   const SizedBox(height: 8),
                   TextButton(
@@ -53,31 +53,33 @@ class ContactsScreen extends ConsumerWidget {
             itemBuilder: (context, index) {
               final contact = contacts[index];
               return Card(
-                color: AppTheme.surfaceDark,
                 margin: const EdgeInsets.only(bottom: 12),
                 child: ListTile(
                   leading: CircleAvatar(
-                    backgroundColor: AppTheme.primaryRed.withValues(alpha: 0.2),
+                    backgroundColor: AppTheme.brandPink.withValues(alpha: 0.15),
                     child: Text(
                       contact.name.isNotEmpty
                           ? contact.name[0].toUpperCase()
                           : '?',
-                      style: const TextStyle(color: AppTheme.primaryRed),
+                      style: const TextStyle(color: AppTheme.brandPink, fontWeight: FontWeight.bold),
                     ),
                   ),
                   title: Text(
                     contact.name,
-                    style: const TextStyle(color: AppTheme.textPrimary),
+                    style: const TextStyle(
+                      color: AppTheme.textBrandPrimary,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   subtitle: Text(
                     '${contact.relationship} • ${contact.phone}',
-                    style: const TextStyle(color: AppTheme.textMuted),
+                    style: const TextStyle(color: AppTheme.textBrandSecondary),
                   ),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.edit, color: AppTheme.textMuted),
+                        icon: Icon(Icons.edit, color: AppTheme.textBrandMuted),
                         onPressed: () =>
                             _showContactDialog(context, ref, contact: contact),
                       ),
@@ -97,7 +99,7 @@ class ContactsScreen extends ConsumerWidget {
           );
         },
         loading: () => const Center(
-          child: CircularProgressIndicator(color: AppTheme.primaryRed),
+          child: CircularProgressIndicator(color: AppTheme.brandPink),
         ),
         error: (err, stack) => Center(
           child: Text(
@@ -108,7 +110,6 @@ class ContactsScreen extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showContactDialog(context, ref),
-        backgroundColor: AppTheme.primaryRed,
         child: const Icon(Icons.add),
       ),
     );
@@ -122,14 +123,14 @@ class ContactsScreen extends ConsumerWidget {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: AppTheme.surfaceDark,
+        backgroundColor: AppTheme.surfaceBrand,
         title: const Text(
           'Delete Contact?',
-          style: TextStyle(color: AppTheme.textPrimary),
+          style: TextStyle(color: AppTheme.textBrandPrimary),
         ),
         content: const Text(
           'Are you sure you want to remove this contact?',
-          style: TextStyle(color: AppTheme.textSecondary),
+          style: TextStyle(color: AppTheme.textBrandSecondary),
         ),
         actions: [
           TextButton(
@@ -234,10 +235,10 @@ class _ContactDialogState extends ConsumerState<_ContactDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: AppTheme.surfaceDark,
+      backgroundColor: AppTheme.surfaceBrand,
       title: Text(
         widget.contact == null ? 'Add Contact' : 'Edit Contact',
-        style: const TextStyle(color: AppTheme.textPrimary),
+        style: const TextStyle(color: AppTheme.textBrandPrimary),
       ),
       content: SingleChildScrollView(
         child: Form(
@@ -247,40 +248,21 @@ class _ContactDialogState extends ConsumerState<_ContactDialog> {
             children: [
               TextFormField(
                 controller: _nameCtrl,
-                style: const TextStyle(color: AppTheme.textPrimary),
-                decoration: const InputDecoration(
-                  labelText: 'Name',
-                  labelStyle: TextStyle(color: AppTheme.textSecondary),
-                  enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: AppTheme.dividerColor),
-                  ),
-                ),
+                decoration: const InputDecoration(labelText: 'Name'),
                 validator: (v) => v?.isEmpty == true ? 'Required' : null,
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _phoneCtrl,
-                style: const TextStyle(color: AppTheme.textPrimary),
-                decoration: const InputDecoration(
-                  labelText: 'Phone Number',
-                  labelStyle: TextStyle(color: AppTheme.textSecondary),
-                  enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: AppTheme.dividerColor),
-                  ),
-                ),
+                decoration: const InputDecoration(labelText: 'Phone Number'),
                 keyboardType: TextInputType.phone,
                 validator: (v) => v?.isEmpty == true ? 'Required' : null,
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _relationCtrl,
-                style: const TextStyle(color: AppTheme.textPrimary),
                 decoration: const InputDecoration(
                   labelText: 'Relationship (e.g. Mom, Partner)',
-                  labelStyle: TextStyle(color: AppTheme.textSecondary),
-                  enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: AppTheme.dividerColor),
-                  ),
                 ),
                 validator: (v) => v?.isEmpty == true ? 'Required' : null,
               ),
@@ -295,13 +277,12 @@ class _ContactDialogState extends ConsumerState<_ContactDialog> {
         ),
         ElevatedButton(
           onPressed: _isLoading ? null : _save,
-          style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryRed),
           child: _isLoading
               ? const SizedBox(
                   width: 20,
                   height: 20,
                   child: CircularProgressIndicator(
-                    color: AppTheme.textPrimary,
+                    color: Colors.white,
                     strokeWidth: 2,
                   ),
                 )
