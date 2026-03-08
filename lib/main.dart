@@ -52,7 +52,7 @@ class MyPanicApp extends ConsumerWidget {
     final router = ref.watch(goRouterProvider);
 
     return MaterialApp.router(
-      title: 'MYPanic',
+      title: 'MyPanic',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.brandTheme,
       routerConfig: router,
