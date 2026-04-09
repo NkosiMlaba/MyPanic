@@ -60,9 +60,8 @@ class CompositeTriggerService implements PanicTriggerService {
       sub.cancel();
     }
     _subscriptions.clear();
-    for (final source in _sources) {
-      source.dispose();
-    }
+    // Do NOT dispose child sources — they are owned by their own providers
+    // and may outlive this composite instance (e.g. manualTriggerServiceProvider).
     _mergedController.close();
   }
 }

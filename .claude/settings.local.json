@@ -8,7 +8,8 @@
       "Bash(adb -s RFCR902H1GE logcat -c)",
       "Bash(adb -s RFCR902H1GE logcat -s \"Flutter\" \"TriggerEngine\" \"PanicForeground\" \"PanicAction\" \"PanicQSTile\" \"my_panic\")",
       "Bash(where adb:*)",
-      "Read(//c/Users/nkosi/AppData/Local/Android/**)"
+      "Read(//c/Users/nkosi/AppData/Local/Android/**)",
+      "Bash(flutter pub:*)"
     ]
   }
 }

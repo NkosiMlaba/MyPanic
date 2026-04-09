@@ -8,10 +8,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:my_panic/core/router/app_router.dart';
+import 'package:my_panic/core/services/location_service.dart';
 import 'package:my_panic/core/theme/app_theme.dart';
 import 'package:my_panic/features/panic/domain/panic_state.dart';
 import 'package:my_panic/features/panic/presentation/providers/panic_notifier.dart';
 import 'package:my_panic/features/panic/presentation/widgets/panic_button_widget.dart';
+import 'package:my_panic/features/user_profile/presentation/providers/contacts_provider.dart';
+import 'package:my_panic/features/user_profile/presentation/providers/settings_provider.dart';
 
 /// Home screen with the main panic button.
 class HomeScreen extends ConsumerStatefulWidget {
@@ -189,35 +192,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             const Expanded(child: Center(child: PanicButtonWidget())),
 
             // Bottom info
-            Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _buildInfoChip(
-                        icon: Icons.people_outline,
-                        label: '5 Contacts',
-                      ),
-                      const SizedBox(width: 12),
-                      _buildInfoChip(
-                        icon: Icons.location_on_outlined,
-                        label: 'GPS Active',
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    '30 second countdown before alert is sent',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: AppTheme.textBrandMuted,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            _buildBottomInfo(ref),
           ],
         ),
       ),
@@ -265,25 +240,168 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildInfoChip({required IconData icon, required String label}) {
+  Widget _buildBottomInfo(WidgetRef ref) {
+    final contactsCountAsync = ref.watch(contactsCountProvider);
+    final countdownDuration = ref.watch(settingsProvider);
+
+    final contactsCount = contactsCountAsync.when(
+      data: (count) => count,
+      loading: () => 0,
+      error: (_, _) => 0,
+    );
+    final contactsLabel = contactsCount == 1
+        ? '1 Contact'
+        : '$contactsCount Contacts';
+    final hasContacts = contactsCount > 0;
+
+    return Padding(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _buildInfoChip(
+                icon: Icons.people_outline,
+                label: contactsLabel,
+                color: hasContacts ? null : AppTheme.warningYellow,
+              ),
+              const SizedBox(width: 12),
+              _GpsStatusChip(locationService: ref.read(locationServiceProvider)),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Text(
+            '$countdownDuration second countdown before alert is sent',
+            style: TextStyle(
+              fontSize: 12,
+              color: AppTheme.textBrandMuted,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoChip({
+    required IconData icon,
+    required String label,
+    Color? color,
+  }) {
+    final iconColor = color ?? AppTheme.textBrandSecondary;
+    final textColor = color ?? AppTheme.textBrandSecondary;
+    final borderColor = color?.withValues(alpha: 0.4) ?? AppTheme.dividerBrand;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: AppTheme.surfaceBrand,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppTheme.dividerBrand),
+        border: Border.all(color: borderColor),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 16, color: AppTheme.textBrandSecondary),
+          Icon(icon, size: 16, color: iconColor),
           const SizedBox(width: 6),
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
-              color: AppTheme.textBrandSecondary,
+              color: textColor,
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Stateful widget that checks GPS status asynchronously and rebuilds.
+class _GpsStatusChip extends StatefulWidget {
+  final LocationService locationService;
+
+  const _GpsStatusChip({required this.locationService});
+
+  @override
+  State<_GpsStatusChip> createState() => _GpsStatusChipState();
+}
+
+class _GpsStatusChipState extends State<_GpsStatusChip>
+    with WidgetsBindingObserver {
+  bool _serviceEnabled = false;
+  bool _hasPermission = false;
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _checkStatus();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Re-check when app resumes (user may have toggled GPS in settings)
+    if (state == AppLifecycleState.resumed) {
+      _checkStatus();
+    }
+  }
+
+  Future<void> _checkStatus() async {
+    final serviceEnabled = await widget.locationService.isServiceEnabled();
+    final hasPermission = await widget.locationService.hasPermission();
+    if (mounted) {
+      setState(() {
+        _serviceEnabled = serviceEnabled;
+        _hasPermission = hasPermission;
+        _loading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_loading) {
+      return _chip(Icons.location_searching, 'GPS...', null);
+    }
+
+    if (!_serviceEnabled) {
+      return _chip(Icons.location_off_outlined, 'GPS Off', AppTheme.emergencyRed);
+    }
+    if (!_hasPermission) {
+      return _chip(Icons.location_disabled_outlined, 'No Permission',
+          AppTheme.warningYellow);
+    }
+    return _chip(Icons.location_on_outlined, 'GPS Active', AppTheme.successGreen);
+  }
+
+  Widget _chip(IconData icon, String label, Color? color) {
+    final iconColor = color ?? AppTheme.textBrandSecondary;
+    final textColor = color ?? AppTheme.textBrandSecondary;
+    final borderColor = color?.withValues(alpha: 0.4) ?? AppTheme.dividerBrand;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceBrand,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: borderColor),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: iconColor),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: TextStyle(fontSize: 12, color: textColor),
           ),
         ],
       ),

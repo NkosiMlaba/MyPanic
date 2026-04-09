@@ -51,7 +51,7 @@ final nativeTriggerBridgeProvider =
 // ignore: unused_element
 typedef NativeTriggerBridgeRef = AutoDisposeProviderRef<NativeTriggerBridge>;
 String _$activeTriggerServiceHash() =>
-    r'66da0fa90461c7b8c7517073686028e245223212';
+    r'8616c2d037c5d0b65d7bd70709d3bf9122e8e664';
 
 /// Provides the active PanicTriggerService.
 ///

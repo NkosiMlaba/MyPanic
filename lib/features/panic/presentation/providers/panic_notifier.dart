@@ -22,6 +22,7 @@ import 'package:my_panic/features/trigger_engine/native_trigger_bridge.dart';
 import 'package:my_panic/features/trigger_engine/notification_trigger_service.dart';
 import 'package:my_panic/features/trigger_engine/shake_trigger_service.dart';
 import 'package:my_panic/features/trigger_engine/qs_tile_trigger_service.dart';
+import 'package:my_panic/features/trigger_engine/widget_trigger_service.dart';
 import 'package:my_panic/features/trigger_engine/trigger_settings_provider.dart';
 import 'package:my_panic/features/user_profile/data/contacts_repository.dart';
 import 'package:my_panic/features/user_profile/presentation/providers/medical_profile_provider.dart';
@@ -71,6 +72,11 @@ PanicTriggerService activeTriggerService(Ref ref) {
   }
   if (settings.qsTileTriggerEnabled && Platform.isAndroid) {
     sources.add(QSTileTriggerService(bridge));
+  }
+
+  // Always include widget trigger on Android — widgets are always available
+  if (Platform.isAndroid) {
+    sources.add(WidgetTriggerService(bridge));
   }
 
   final composite = CompositeTriggerService(sources);

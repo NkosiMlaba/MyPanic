@@ -26,7 +26,7 @@ flutter run -d MPK0222525000545
 <!-- Samsung -->
 flutter run -d RFCR902H1GE
 
-<!-- Samsung -->
+<!-- Samsung Ayanda -->
 flutter run -d R7AWB0CBM7A
 
 <!-- Build -->
