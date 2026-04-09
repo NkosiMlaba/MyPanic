@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MyPanic</string>
+    <string name="widget_panic_button_desc">Emergency panic button — one tap to trigger alert</string>
+    <string name="widget_panic_status_desc">Shows armed status with panic trigger button</string>
+    <string name="widget_panic_quick_desc">Compact panic trigger with status indicator</string>
+</resources>

@@ -74,6 +74,7 @@ PanicTriggerService activeTriggerService(Ref ref) {
   }
 
   final composite = CompositeTriggerService(sources);
+  composite.armSystem(); // Arm all sources so native services start
   ref.onDispose(() => composite.dispose());
   return composite;
 }

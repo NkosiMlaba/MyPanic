@@ -31,16 +31,20 @@ class PanicActionReceiver : BroadcastReceiver() {
         if (now - lastTriggerTime < DEBOUNCE_MS) return
         lastTriggerTime = now
 
+        // Determine trigger source (widget or notification)
+        val triggerSource = intent.getStringExtra("source") ?: "notification"
+        android.util.Log.d("PanicActionReceiver", "Panic triggered from: $triggerSource")
+
         // Try sending via EventChannel first (Flutter engine running)
         TriggerEnginePlugin.sendTriggerEvent(
-            source = "notification",
-            metadata = mapOf("trigger_method" to "notification_action")
+            source = triggerSource,
+            metadata = mapOf("trigger_method" to "${triggerSource}_action")
         )
 
         // Always bring app to foreground — the countdown screen needs to be visible
         val launchIntent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            putExtra("TRIGGER_SOURCE", "notification")
+            putExtra("TRIGGER_SOURCE", triggerSource)
         }
         context.startActivity(launchIntent)
     }

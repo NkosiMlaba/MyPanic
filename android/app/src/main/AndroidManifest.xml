@@ -52,6 +52,43 @@
             </intent-filter>
         </service>
 
+        <!-- Home screen widgets -->
+        <receiver
+            android:name=".PanicButtonWidgetProvider"
+            android:exported="true"
+            android:label="Panic Button">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_panic_button_info" />
+        </receiver>
+
+        <receiver
+            android:name=".PanicStatusWidgetProvider"
+            android:exported="true"
+            android:label="MyPanic Status">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_panic_status_info" />
+        </receiver>
+
+        <receiver
+            android:name=".PanicQuickWidgetProvider"
+            android:exported="true"
+            android:label="Quick Panic">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_panic_quick_info" />
+        </receiver>
+
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data

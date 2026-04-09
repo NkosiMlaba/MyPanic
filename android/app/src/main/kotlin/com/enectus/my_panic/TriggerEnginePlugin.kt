@@ -87,8 +87,11 @@ object TriggerEnginePlugin {
                 }
                 context.startService(intent)
 
-                // Also write to SharedPreferences for QS tile to read
+                // Also write to SharedPreferences for QS tile and widgets to read
                 getPrefs(context).edit().putBoolean("armed", armed).apply()
+
+                // Refresh home screen widgets to reflect armed state
+                PanicWidgetUpdater.updateAllWidgets(context)
                 result.success(null)
             }
 
@@ -126,6 +129,8 @@ object TriggerEnginePlugin {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     PanicQSTileService.requestListeningState(context)
                 }
+                // Refresh home screen widgets
+                PanicWidgetUpdater.updateAllWidgets(context)
                 result.success(null)
             }
 

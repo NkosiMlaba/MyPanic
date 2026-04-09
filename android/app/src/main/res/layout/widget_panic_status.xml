@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 4x1 Panic Status Widget: shows status text + panic button -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_status_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_background_armed"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="12dp">
+
+    <!-- Shield icon -->
+    <ImageView
+        android:id="@+id/widget_status_icon"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginEnd="12dp"
+        android:src="@drawable/ic_widget_panic"
+        android:contentDescription="MyPanic Status" />
+
+    <!-- Status text area -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/widget_status_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="MyPanic"
+            android:textColor="#FF605757"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/widget_status_subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="System Armed"
+            android:textColor="#FFA69D9C"
+            android:textSize="12sp" />
+
+    </LinearLayout>
+
+    <!-- Panic trigger button -->
+    <FrameLayout
+        android:id="@+id/widget_status_panic_btn"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="@drawable/widget_panic_button_bg"
+        android:gravity="center">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="SOS"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+
+    </FrameLayout>
+
+</LinearLayout>

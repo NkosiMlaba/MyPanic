@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 2x1 Quick Panic Widget: compact with icon and text -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_quick_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_background_armed"
+    android:gravity="center"
+    android:orientation="horizontal"
+    android:padding="8dp">
+
+    <ImageView
+        android:id="@+id/widget_quick_icon"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:layout_marginEnd="8dp"
+        android:src="@drawable/ic_widget_panic"
+        android:contentDescription="Panic" />
+
+    <TextView
+        android:id="@+id/widget_quick_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="PANIC"
+        android:textColor="#FFE53935"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+</LinearLayout>

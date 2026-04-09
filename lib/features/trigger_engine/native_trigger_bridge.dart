@@ -37,12 +37,17 @@ class NativeTriggerBridge {
   void _handleNativeEvent(dynamic event) {
     if (event is! Map) return;
 
-    final sourceStr = event['source'] as String?;
+    final sourceStr = event['source']?.toString();
     final timestamp = event['timestamp'] as int?;
-    final metadata = event['metadata'] as Map<String, dynamic>?;
+    final rawMetadata = event['metadata'];
+    final metadata = rawMetadata is Map
+        ? rawMetadata.map((k, v) => MapEntry(k.toString(), v))
+        : null;
 
     final source = _parseSource(sourceStr);
     if (source == null) return;
+
+    print('[NativeTriggerBridge] Received trigger event: source=$sourceStr');
 
     _triggerController.add(TriggerEvent(
       timestamp: timestamp != null
@@ -58,13 +63,13 @@ class NativeTriggerBridge {
       'notification' => TriggerSource.notification,
       'shake' => TriggerSource.shake,
       'qs_tile' => TriggerSource.qsTile,
+      'widget' => TriggerSource.widget,
       _ => null,
     };
   }
 
   void _handleError(Object error) {
-    // EventChannel errors are non-fatal — the channel will be re-established
-    // on next listen. Log but don't crash.
+    print('[NativeTriggerBridge] EventChannel error: $error');
   }
 
   // ── MethodChannel calls (Dart → Native) ─────────────────────────────────
@@ -72,7 +77,13 @@ class NativeTriggerBridge {
   /// Start the foreground service with persistent notification.
   Future<void> startForegroundService() async {
     if (!Platform.isAndroid) return;
-    await _methodChannel.invokeMethod('startForegroundService');
+    try {
+      print('[NativeTriggerBridge] Calling startForegroundService');
+      await _methodChannel.invokeMethod('startForegroundService');
+      print('[NativeTriggerBridge] startForegroundService succeeded');
+    } catch (e) {
+      print('[NativeTriggerBridge] startForegroundService failed: $e');
+    }
   }
 
   /// Stop the foreground service.
@@ -91,7 +102,13 @@ class NativeTriggerBridge {
   /// Enable or disable shake detection in the foreground service.
   Future<void> setShakeEnabled({required bool enabled}) async {
     if (!Platform.isAndroid) return;
-    await _methodChannel.invokeMethod('setShakeEnabled', {'enabled': enabled});
+    try {
+      print('[NativeTriggerBridge] Calling setShakeEnabled($enabled)');
+      await _methodChannel.invokeMethod('setShakeEnabled', {'enabled': enabled});
+      print('[NativeTriggerBridge] setShakeEnabled succeeded');
+    } catch (e) {
+      print('[NativeTriggerBridge] setShakeEnabled failed: $e');
+    }
   }
 
   /// Set shake sensitivity level.
@@ -107,8 +124,14 @@ class NativeTriggerBridge {
     required bool loggedIn,
   }) async {
     if (!Platform.isAndroid) return;
-    await _methodChannel.invokeMethod(
-        'updateQSTileState', {'armed': armed, 'loggedIn': loggedIn});
+    try {
+      print('[NativeTriggerBridge] Calling updateQSTileState(armed=$armed, loggedIn=$loggedIn)');
+      await _methodChannel.invokeMethod(
+          'updateQSTileState', {'armed': armed, 'loggedIn': loggedIn});
+      print('[NativeTriggerBridge] updateQSTileState succeeded');
+    } catch (e) {
+      print('[NativeTriggerBridge] updateQSTileState failed: $e');
+    }
   }
 
   /// Check if the foreground service is currently running.

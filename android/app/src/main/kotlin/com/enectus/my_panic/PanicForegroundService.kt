@@ -67,9 +67,11 @@ class PanicForegroundService : Service(), SensorEventListener {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        android.util.Log.d("PanicForeground", "onStartCommand action=${intent?.action}")
         when (intent?.action) {
             ACTION_START -> {
                 isRunning = true
+                android.util.Log.d("PanicForeground", "Starting foreground service")
                 startForeground(NOTIFICATION_ID, buildNotification(armed = true))
             }
 
@@ -90,6 +92,7 @@ class PanicForegroundService : Service(), SensorEventListener {
 
             ACTION_SET_SHAKE_ENABLED -> {
                 val enabled = intent.getBooleanExtra("enabled", false)
+                android.util.Log.d("PanicForeground", "setShakeEnabled=$enabled, accelerometer=${accelerometer != null}")
                 if (enabled) startShakeDetection() else stopShakeDetection()
             }
 
@@ -166,13 +169,18 @@ class PanicForegroundService : Service(), SensorEventListener {
     // ── Shake Detection ────────────────────────────────────────────────────
 
     private fun startShakeDetection() {
+        android.util.Log.d("PanicForeground", "startShakeDetection: shakeEnabled=$shakeEnabled, accelerometer=${accelerometer != null}")
         if (shakeEnabled) return
-        if (accelerometer == null) return
+        if (accelerometer == null) {
+            android.util.Log.e("PanicForeground", "No accelerometer sensor available!")
+            return
+        }
 
         shakeEnabled = true
-        sensorManager?.registerListener(
+        val registered = sensorManager?.registerListener(
             this, accelerometer, SensorManager.SENSOR_DELAY_GAME
         )
+        android.util.Log.d("PanicForeground", "Accelerometer listener registered=$registered")
     }
 
     private fun stopShakeDetection() {
@@ -234,6 +242,7 @@ class PanicForegroundService : Service(), SensorEventListener {
     }
 
     private fun onShakeDetected() {
+        android.util.Log.d("PanicForeground", "SHAKE DETECTED! Sending trigger event")
         TriggerEnginePlugin.sendTriggerEvent(
             source = "shake",
             metadata = mapOf("trigger_method" to "shake_detection")
