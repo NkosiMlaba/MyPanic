@@ -1,4 +1,4 @@
-# my_panic
+# MyPanic
 
 A new Flutter project.
 
@@ -39,6 +39,7 @@ Current:
     Alternatively have the in app notifications, (which might require a paring thing either QR code or paring code)
 <!-- Logo of app and name -->
 
-Change the in app name from small letters
+-Change the in app name from small letters
+-Explore ways to have the app panic button be activated by pressing some certain buttons on the phone example volume up, etc
 So hardcoding the status values on the home screen like the number of contacts and active location status
 

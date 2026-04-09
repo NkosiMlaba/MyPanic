@@ -29,11 +29,34 @@ final manualTriggerServiceProvider =
 // ignore: unused_element
 typedef ManualTriggerServiceRef =
     AutoDisposeProviderRef<ManualPanicTriggerService>;
+String _$nativeTriggerBridgeHash() =>
+    r'5823d38a6e268a06a204787a21d203980c7a268b';
+
+/// Provides the NativeTriggerBridge singleton.
+///
+/// Copied from [nativeTriggerBridge].
+@ProviderFor(nativeTriggerBridge)
+final nativeTriggerBridgeProvider =
+    AutoDisposeProvider<NativeTriggerBridge>.internal(
+      nativeTriggerBridge,
+      name: r'nativeTriggerBridgeProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$nativeTriggerBridgeHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef NativeTriggerBridgeRef = AutoDisposeProviderRef<NativeTriggerBridge>;
 String _$activeTriggerServiceHash() =>
-    r'3bc766d91e7927bf2773229d2027a0190a1e800b';
+    r'66da0fa90461c7b8c7517073686028e245223212';
 
 /// Provides the active PanicTriggerService.
-/// This abstraction allows swapping trigger implementations.
+///
+/// Builds a [CompositeTriggerService] that merges the manual trigger with
+/// any enabled native triggers (notification, shake, QS tile).
 ///
 /// Copied from [activeTriggerService].
 @ProviderFor(activeTriggerService)

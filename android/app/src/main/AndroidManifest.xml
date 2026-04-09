@@ -25,6 +25,33 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <!-- Foreground service for persistent notification + shake detection -->
+        <service
+            android:name=".PanicForegroundService"
+            android:foregroundServiceType="location"
+            android:exported="false" />
+
+        <!-- Handles PANIC action button taps from the notification -->
+        <receiver
+            android:name=".PanicActionReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.enectus.my_panic.ACTION_PANIC_TRIGGERED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Quick Settings tile (API 24+) -->
+        <service
+            android:name=".PanicQSTileService"
+            android:icon="@drawable/ic_panic_tile"
+            android:label="MyPanic"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data
@@ -56,5 +83,12 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
+
+    <!-- Trigger engine: foreground service, notification, shake, QS tile -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.HIGH_SAMPLING_RATE_SENSORS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
 </manifest>

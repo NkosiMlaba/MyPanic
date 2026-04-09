@@ -1,9 +1,13 @@
+import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:my_panic/core/router/app_router.dart';
+import 'package:my_panic/core/services/permission_service.dart';
 import 'package:my_panic/core/theme/app_theme.dart';
 import 'package:my_panic/features/auth/data/auth_repository.dart';
+import 'package:my_panic/features/trigger_engine/shake_trigger_service.dart';
+import 'package:my_panic/features/trigger_engine/trigger_settings_provider.dart';
 import 'package:my_panic/features/user_profile/presentation/providers/settings_provider.dart';
 import 'package:my_panic/features/user_profile/presentation/providers/user_profile_provider.dart';
 
@@ -76,6 +80,9 @@ class SettingsScreen extends ConsumerWidget {
               );
             },
           ),
+          const SizedBox(height: 24),
+          _buildSectionHeader('Trigger Methods'),
+          _buildTriggerSettings(context, ref),
           const SizedBox(height: 24),
           _buildSectionHeader('Security'),
           _buildSettingsTile(
@@ -170,6 +177,111 @@ class SettingsScreen extends ConsumerWidget {
           letterSpacing: 1.2,
         ),
       ),
+    );
+  }
+
+  Widget _buildTriggerSettings(BuildContext context, WidgetRef ref) {
+    final settings = ref.watch(triggerSettingsProvider);
+    final notifier = ref.read(triggerSettingsProvider.notifier);
+
+    return Column(
+      children: [
+        // Notification Panic Button
+        if (Platform.isAndroid)
+          SwitchListTile(
+            secondary: const Icon(Icons.notifications_active_outlined),
+            title: const Text(
+              'Notification Panic Button',
+              style: TextStyle(fontSize: 16),
+            ),
+            subtitle: const Text(
+              'Persistent notification with emergency button',
+              style: TextStyle(color: AppTheme.textBrandSecondary),
+            ),
+            value: settings.notificationTriggerEnabled,
+            activeThumbColor: AppTheme.brandPink,
+            onChanged: (value) async {
+              if (value) {
+                final permService = PermissionService();
+                final granted =
+                    await permService.requestNotificationPermission();
+                if (!granted) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'Notification permission is required for this feature',
+                        ),
+                      ),
+                    );
+                  }
+                  return;
+                }
+              }
+              notifier.setNotificationTriggerEnabled(value);
+            },
+          ),
+
+        // Shake to Panic
+        SwitchListTile(
+          secondary: const Icon(Icons.vibration),
+          title: const Text(
+            'Shake to Panic',
+            style: TextStyle(fontSize: 16),
+          ),
+          subtitle: const Text(
+            'Shake your phone vigorously to trigger panic',
+            style: TextStyle(color: AppTheme.textBrandSecondary),
+          ),
+          value: settings.shakeTriggerEnabled,
+          activeThumbColor: AppTheme.brandPink,
+          onChanged: (value) => notifier.setShakeTriggerEnabled(value),
+        ),
+
+        // Shake Sensitivity (only visible when shake is enabled)
+        if (settings.shakeTriggerEnabled)
+          ListTile(
+            leading: const SizedBox(width: 24), // indent to align with toggles
+            title: const Text(
+              'Shake Sensitivity',
+              style: TextStyle(fontSize: 16),
+            ),
+            trailing: DropdownButton<ShakeSensitivity>(
+              value: settings.shakeSensitivity,
+              dropdownColor: AppTheme.surfaceBrand,
+              style: const TextStyle(color: AppTheme.textBrandPrimary),
+              underline: const SizedBox(),
+              items: ShakeSensitivity.values.map((s) {
+                final label = switch (s) {
+                  ShakeSensitivity.low => 'Low',
+                  ShakeSensitivity.medium => 'Medium',
+                  ShakeSensitivity.high => 'High',
+                };
+                return DropdownMenuItem(value: s, child: Text(label));
+              }).toList(),
+              onChanged: (val) {
+                if (val != null) notifier.setShakeSensitivity(val);
+              },
+            ),
+          ),
+
+        // Quick Settings Tile (Android only, informational)
+        if (Platform.isAndroid)
+          SwitchListTile(
+            secondary: const Icon(Icons.dashboard_customize_outlined),
+            title: const Text(
+              'Quick Settings Tile',
+              style: TextStyle(fontSize: 16),
+            ),
+            subtitle: const Text(
+              'Add MyPanic to your Quick Settings panel',
+              style: TextStyle(color: AppTheme.textBrandSecondary),
+            ),
+            value: settings.qsTileTriggerEnabled,
+            activeThumbColor: AppTheme.brandPink,
+            onChanged: (value) => notifier.setQSTileTriggerEnabled(value),
+          ),
+      ],
     );
   }
 

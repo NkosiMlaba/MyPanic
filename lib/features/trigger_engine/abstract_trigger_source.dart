@@ -20,7 +20,7 @@ class TriggerEvent {
 }
 
 /// Identifies the type of trigger source
-enum TriggerSource { manual, ble, voice, gesture }
+enum TriggerSource { manual, ble, voice, gesture, notification, shake, qsTile }
 
 /// Abstract interface for all panic trigger services.
 ///

@@ -5,6 +5,7 @@ library;
 /// Exposes the trigger service, panic notifier, and related dependencies.
 
 import 'dart:async';
+import 'dart:io' show Platform;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:my_panic/core/services/haptic_service.dart';
@@ -16,6 +17,12 @@ import 'package:my_panic/features/user_profile/presentation/providers/settings_p
 import 'package:my_panic/features/panic/domain/entities/medical_profile.dart';
 import 'package:my_panic/features/trigger_engine/abstract_trigger_source.dart';
 import 'package:my_panic/features/trigger_engine/manual_trigger_source.dart';
+import 'package:my_panic/features/trigger_engine/composite_trigger_service.dart';
+import 'package:my_panic/features/trigger_engine/native_trigger_bridge.dart';
+import 'package:my_panic/features/trigger_engine/notification_trigger_service.dart';
+import 'package:my_panic/features/trigger_engine/shake_trigger_service.dart';
+import 'package:my_panic/features/trigger_engine/qs_tile_trigger_service.dart';
+import 'package:my_panic/features/trigger_engine/trigger_settings_provider.dart';
 import 'package:my_panic/features/user_profile/data/contacts_repository.dart';
 import 'package:my_panic/features/user_profile/presentation/providers/medical_profile_provider.dart';
 
@@ -35,13 +42,40 @@ ManualPanicTriggerService manualTriggerService(Ref ref) {
   return service;
 }
 
+/// Provides the NativeTriggerBridge singleton.
+@riverpod
+NativeTriggerBridge nativeTriggerBridge(Ref ref) {
+  final bridge = NativeTriggerBridge();
+  bridge.initialize();
+  ref.onDispose(() => bridge.dispose());
+  return bridge;
+}
+
 /// Provides the active PanicTriggerService.
-/// This abstraction allows swapping trigger implementations.
+///
+/// Builds a [CompositeTriggerService] that merges the manual trigger with
+/// any enabled native triggers (notification, shake, QS tile).
 @riverpod
 PanicTriggerService activeTriggerService(Ref ref) {
-  // For MVP, always use manual trigger
-  // In Phase 2, this could check user settings to use BLE
-  return ref.watch(manualTriggerServiceProvider);
+  final manual = ref.watch(manualTriggerServiceProvider);
+  final settings = ref.watch(triggerSettingsProvider);
+  final bridge = ref.watch(nativeTriggerBridgeProvider);
+
+  final sources = <PanicTriggerService>[manual];
+
+  if (settings.notificationTriggerEnabled) {
+    sources.add(NotificationTriggerService(bridge));
+  }
+  if (settings.shakeTriggerEnabled) {
+    sources.add(ShakeTriggerService(bridge, sensitivity: settings.shakeSensitivity));
+  }
+  if (settings.qsTileTriggerEnabled && Platform.isAndroid) {
+    sources.add(QSTileTriggerService(bridge));
+  }
+
+  final composite = CompositeTriggerService(sources);
+  ref.onDispose(() => composite.dispose());
+  return composite;
 }
 
 /// Provides the HapticService.
