@@ -2,20 +2,28 @@ name: Build Android APK
 
 on:
   push:
-    branches: [main]
     tags: ['v*']
-  pull_request:
-    branches: [main]
   workflow_dispatch:
     inputs:
-      release_notes:
-        description: 'Notes to include on the GitHub Release (tag builds only)'
+      tag:
+        description: 'Release tag (leave blank to auto-generate build-<timestamp>-<sha>)'
         required: false
         default: ''
+      notes:
+        description: 'Extra release notes'
+        required: false
+        default: ''
+      prerelease:
+        description: 'Mark as pre-release'
+        type: boolean
+        default: true
 
 concurrency:
   group: build-apk-${{ github.ref }}
   cancel-in-progress: true
+
+permissions:
+  contents: write
 
 env:
   FLUTTER_VERSION: '3.38.9'
@@ -24,7 +32,7 @@ env:
 
 jobs:
   build:
-    name: Build Release APK
+    name: Build & Publish APK
     runs-on: ubuntu-latest
     timeout-minutes: 45
 
@@ -63,9 +71,6 @@ jobs:
           restore-keys: |
             pub-${{ runner.os }}-
 
-      - name: Verify Flutter install
-        run: flutter --version
-
       - name: Decode google-services.json
         env:
           GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
@@ -75,7 +80,7 @@ jobs:
             exit 1
           fi
           echo "$GOOGLE_SERVICES_JSON" | base64 -d > android/app/google-services.json
-          if ! python3 -c "import json,sys; json.load(open('android/app/google-services.json'))" 2>/dev/null; then
+          if ! python3 -c "import json; json.load(open('android/app/google-services.json'))" 2>/dev/null; then
             echo "::error::Decoded google-services.json is not valid JSON. Re-encode with: base64 -w0 android/app/google-services.json"
             exit 1
           fi
@@ -86,50 +91,45 @@ jobs:
       - name: Run code generation
         run: dart run build_runner build --delete-conflicting-outputs
 
-      - name: Analyze (non-blocking)
-        run: flutter analyze || true
-
-      - name: Build release APK (split per ABI)
-        run: flutter build apk --release --split-per-abi
-
-      - name: Build universal release APK
+      - name: Build release APK
         run: flutter build apk --release
 
-      - name: Collect APKs
-        id: collect
+      - name: Stage APK
         run: |
-          mkdir -p artifacts
-          cp build/app/outputs/flutter-apk/app-release.apk artifacts/MyPanic-universal-release.apk
-          cp build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk artifacts/MyPanic-armeabi-v7a-release.apk
-          cp build/app/outputs/flutter-apk/app-arm64-v8a-release.apk artifacts/MyPanic-arm64-v8a-release.apk
-          cp build/app/outputs/flutter-apk/app-x86_64-release.apk artifacts/MyPanic-x86_64-release.apk
-          ls -lh artifacts/
-          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
-          echo "short_sha=$SHORT_SHA" >> "$GITHUB_OUTPUT"
+          mkdir -p release
+          cp build/app/outputs/flutter-apk/app-release.apk release/MyPanic.apk
+          ls -lh release/
 
-      - name: Upload APK artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: MyPanic-APK-${{ steps.collect.outputs.short_sha }}
-          path: artifacts/*.apk
-          if-no-files-found: error
-          retention-days: 30
+      - name: Resolve release tag
+        id: tag
+        run: |
+          if [[ "${{ github.ref_type }}" == "tag" ]]; then
+            TAG="${{ github.ref_name }}"
+          elif [[ -n "${{ github.event.inputs.tag }}" ]]; then
+            TAG="${{ github.event.inputs.tag }}"
+          else
+            TAG="build-$(date -u +'%Y%m%d-%H%M')-$(echo ${{ github.sha }} | cut -c1-7)"
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "Release tag: $TAG"
 
-      - name: Create GitHub Release (tag builds only)
-        if: startsWith(github.ref, 'refs/tags/v')
+      - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: artifacts/*.apk
+          tag_name: ${{ steps.tag.outputs.tag }}
+          name: MyPanic ${{ steps.tag.outputs.tag }}
+          files: release/MyPanic.apk
+          prerelease: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.prerelease == 'true' }}
           generate_release_notes: true
+          fail_on_unmatched_files: true
           body: |
-            MyPanic Android release build.
+            **MyPanic — Android test build**
 
-            **Downloads:**
-            - `MyPanic-arm64-v8a-release.apk` — modern 64-bit phones (recommended for most users)
-            - `MyPanic-armeabi-v7a-release.apk` — older 32-bit phones
-            - `MyPanic-x86_64-release.apk` — Android emulators / x86 devices
-            - `MyPanic-universal-release.apk` — works everywhere, larger file
+            Download `MyPanic.apk` below and open it on your phone to install.
 
-            ${{ github.event.inputs.release_notes }}
+            Installation:
+            1. In your browser/file manager, enable *Install unknown apps*.
+            2. Tap the downloaded APK.
+            3. Accept the prompts.
 
-            Install: enable "Install unknown apps" for your browser/file manager, then open the downloaded APK.
+            ${{ github.event.inputs.notes }}
