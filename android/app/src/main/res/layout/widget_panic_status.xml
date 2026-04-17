@@ -7,7 +7,7 @@
     android:background="@drawable/widget_background_armed"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:padding="12dp">
+    android:padding="16dp">
 
     <!-- Shield icon -->
     <ImageView

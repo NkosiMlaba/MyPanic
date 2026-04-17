@@ -7,6 +7,7 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -14,6 +15,7 @@ import android.hardware.SensorManager
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import kotlin.math.sqrt
 
 /**
@@ -72,6 +74,11 @@ class PanicForegroundService : Service(), SensorEventListener {
             ACTION_START -> {
                 isRunning = true
                 android.util.Log.d("PanicForeground", "Starting foreground service")
+                if (!hasLocationPermission()) {
+                    android.util.Log.w("PanicForeground", "Location permission not granted yet — skipping startForeground")
+                    stopSelf()
+                    return START_NOT_STICKY
+                }
                 startForeground(NOTIFICATION_ID, buildNotification(armed = true))
             }
 
@@ -85,9 +92,11 @@ class PanicForegroundService : Service(), SensorEventListener {
 
             ACTION_UPDATE_STATE -> {
                 isArmed = intent.getBooleanExtra("armed", true)
-                val notification = buildNotification(armed = isArmed)
-                val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                nm.notify(NOTIFICATION_ID, notification)
+                if (isRunning) {
+                    val notification = buildNotification(armed = isArmed)
+                    val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                    nm.notify(NOTIFICATION_ID, notification)
+                }
             }
 
             ACTION_SET_SHAKE_ENABLED -> {
@@ -103,6 +112,11 @@ class PanicForegroundService : Service(), SensorEventListener {
         }
 
         return START_STICKY
+    }
+
+    private fun hasLocationPermission(): Boolean {
+        return ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+               ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
     }
 
     // ── Notification ───────────────────────────────────────────────────────

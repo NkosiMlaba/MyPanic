@@ -7,7 +7,7 @@
     android:background="@drawable/widget_background_armed"
     android:gravity="center"
     android:orientation="horizontal"
-    android:padding="8dp">
+    android:padding="16dp">
 
     <ImageView
         android:id="@+id/widget_quick_icon"

@@ -9,4 +9,5 @@
     android:widgetCategory="home_screen"
     android:description="@string/widget_panic_status_desc"
     android:previewLayout="@layout/widget_panic_status"
-    android:updatePeriodMillis="0" />
+    android:updatePeriodMillis="0"
+    android:widgetFeatures="reconfigurable" />
