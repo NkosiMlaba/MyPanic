@@ -1,6 +1,9 @@
 # added files
 android/app/google-services.json
 .env
+*.md
+.claude
+
 
 /ios
 /linux
