@@ -78,6 +78,9 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
 
+  # Mocking for unit tests (xUnit-equivalent).
+  mocktail: ^1.0.4
+
   # Code Generation
   build_runner: ^2.4.8
   riverpod_generator: ^4.0.0
