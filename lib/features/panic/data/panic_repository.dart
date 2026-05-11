@@ -1,117 +1,100 @@
-/// Panic repository for backend communication.
+/// Panic repository — REST-backed against MyPanic.Api.
 library;
 
-///
-/// Handles sending emergency alerts to the backend and SMS to contacts.
+/// Sends emergency alerts to /api/v1/alerts and cancels them via
+/// /api/v1/alerts/{id}/cancel. The backend owns SMS fan-out via SMSFlow, so
+/// `sendSmsToContacts` is intentionally gone — the panic flow now hands the
+/// alert to the server and the server dispatches per-recipient jobs through
+/// FanOutAlertJob.
 
 import 'dart:developer' as developer;
+
 import 'package:geolocator/geolocator.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'dart:io' show Platform;
-import 'package:my_panic/features/panic/domain/entities/emergency_contact.dart';
-import 'package:my_panic/features/panic/domain/entities/medical_profile.dart';
+import 'package:uuid/uuid.dart';
+
+import 'package:my_panic/core/api/api_exception.dart';
+import 'package:my_panic/core/api/my_panic_api_client.dart';
 import 'package:my_panic/features/panic/domain/entities/alert_status.dart';
 
-/// Repository for panic-related backend operations.
 class PanicRepository {
-  /// Sends an emergency alert to the backend.
-  ///
-  /// In MVP, this logs the action. In production, this would make an API call.
+  final MyPanicApiClient _api;
+
+  PanicRepository(this._api);
+
+  /// Posts a panic alert. Returns 202-derived [AlertStatus] (the API responds
+  /// fast and dispatches SMS asynchronously — recipient list is not known at
+  /// this point, so [AlertStatus.notifiedContacts] stays empty). Throws
+  /// [ApiException] on non-2xx; caller maps that to a user-visible error.
   Future<AlertStatus> sendEmergencyAlert({
     required Position location,
-    required MedicalProfile profile,
-    required List<EmergencyContact> contacts,
+    required DateTime triggeredAt,
   }) async {
-    final alertId = DateTime.now().millisecondsSinceEpoch.toString();
+    final clientIdempotencyKey = const Uuid().v4();
+    final body = {
+      'latitude': location.latitude,
+      'longitude': location.longitude,
+      // geolocator's accuracy is meters; null is fine if the platform didn't
+      // report it.
+      'locationAccuracyM':
+          location.accuracy.isFinite ? location.accuracy : null,
+      'triggeredAt': triggeredAt.toUtc().toIso8601String(),
+      'clientIdempotencyKey': clientIdempotencyKey,
+    };
 
-    developer.log(
-      'EMERGENCY ALERT SENT',
-      name: 'PanicRepository',
-      error: {
-        'alertId': alertId,
-        'latitude': location.latitude,
-        'longitude': location.longitude,
-        'contactsCount': contacts.length,
-        'bloodType': profile.bloodType,
-        'allergies': profile.allergies,
-        'conditions': profile.conditions,
-      },
-    );
-
-    // TODO: In production, make actual API call:
-    // final response = await _apiClient.post('/api/alerts', body: {
-    //   'location': {'lat': location.latitude, 'lng': location.longitude},
-    //   'profile': profile.toJson(),
-    //   'contacts': contacts.map((c) => c.toJson()).toList(),
-    // });
-
-    // Simulate network delay
-    await Future.delayed(const Duration(milliseconds: 500));
-
+    final json = await _api.post('/api/v1/alerts', body) as Map<String, dynamic>;
     return AlertStatus(
-      alertId: alertId,
-      createdAt: DateTime.now(),
-      state: AlertState.sent,
+      alertId: json['alertId'] as String,
+      createdAt: _parseDate(json['triggeredAt']) ?? DateTime.now().toUtc(),
+      state: _stateFromApi(json['status'] as String?),
       latitude: location.latitude,
       longitude: location.longitude,
-      notifiedContacts: contacts.map((c) => c.phone).toList(),
     );
   }
 
-  /// Sends SMS to emergency contacts.
-  ///
-  /// Uses flutter_sms to send messages. Fallback to url_launcher for direct
-  /// intents if needed.
-  Future<bool> sendSmsToContacts({
-    required List<EmergencyContact> contacts,
-    required Position location,
-  }) async {
-    final message =
-        'EMERGENCY ALERT! I need help! My location: https://maps.google.com/?q=${location.latitude},${location.longitude}';
-
-    if (contacts.isEmpty) return false;
-
-    // Create a list of phone numbers
-    final phones = contacts.map((c) => c.phone).toList();
-
-    // Determine separator based on platform
-    // Android uses semicolon ';', iOS uses comma ',' (sometimes) or just one number
-    String separator = ';';
-    if (Platform.isIOS) {
-      separator = ',';
-    }
-
-    final path = phones.join(separator);
-
-    final uri = Uri(
-      scheme: 'sms',
-      path: path,
-      queryParameters: {'body': message},
-    );
-
-    try {
-      if (await canLaunchUrl(uri)) {
-        await launchUrl(uri);
-        return true;
-      }
-      return false;
-    } catch (e) {
-      developer.log('Error launching SMS: $e', name: 'PanicRepository');
-      return false;
-    }
-  }
-
-  /// Cancels an active alert.
+  /// Cancels an in-flight alert. The server flips status to Cancelled; per
+  /// AlertsController, per-recipient SMS already enqueued may still send (race
+  /// is documented server-side). Returns true if the API accepted the cancel.
   Future<bool> cancelAlert(String alertId) async {
-    developer.log(
-      'ALERT CANCELLED',
-      name: 'PanicRepository',
-      error: {'alertId': alertId},
-    );
+    try {
+      await _api.post('/api/v1/alerts/$alertId/cancel', null);
+      return true;
+    } on ApiException catch (e) {
+      developer.log(
+        'cancelAlert($alertId) failed',
+        name: 'PanicRepository',
+        error: e,
+      );
+      return false;
+    }
+  }
 
-    // TODO: Notify backend that alert was cancelled
-    // await _apiClient.post('/api/alerts/$alertId/cancel');
+  // ── helpers ─────────────────────────────────────────────────────────────
 
-    return true;
+  static DateTime? _parseDate(Object? raw) =>
+      raw is String ? DateTime.tryParse(raw) : null;
+
+  /// Map the API's status string ("Pending", "Sending", "Sent", ...) onto
+  /// [AlertState]. The 202 response from POST /alerts is almost always
+  /// "Pending" — the client polls GET /alerts/{id} for terminal status.
+  static AlertState _stateFromApi(String? status) {
+    switch (status?.toLowerCase()) {
+      case 'sending':
+        return AlertState.sending;
+      case 'sent':
+        return AlertState.sent;
+      case 'acknowledged':
+        return AlertState.acknowledged;
+      case 'resolved':
+        return AlertState.resolved;
+      case 'failed':
+        return AlertState.failed;
+      case 'cancelled':
+        // No dedicated AlertState.cancelled in the Flutter enum yet; treat as
+        // failed so UI clears the "active" state.
+        return AlertState.failed;
+      case 'pending':
+      default:
+        return AlertState.pending;
+    }
   }
 }

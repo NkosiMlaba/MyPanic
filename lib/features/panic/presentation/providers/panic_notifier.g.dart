@@ -272,18 +272,18 @@ final class LocationServiceProvider
 
 String _$locationServiceHash() => r'38d15292e1d1d4553c8f07a36b00411aa0a8d30e';
 
-/// Provides the PanicRepository.
+/// Provides the PanicRepository, wired to the typed MyPanic API client.
 
 @ProviderFor(panicRepository)
 final panicRepositoryProvider = PanicRepositoryProvider._();
 
-/// Provides the PanicRepository.
+/// Provides the PanicRepository, wired to the typed MyPanic API client.
 
 final class PanicRepositoryProvider
     extends
         $FunctionalProvider<PanicRepository, PanicRepository, PanicRepository>
     with $Provider<PanicRepository> {
-  /// Provides the PanicRepository.
+  /// Provides the PanicRepository, wired to the typed MyPanic API client.
   PanicRepositoryProvider._()
     : super(
         from: null,
@@ -317,7 +317,7 @@ final class PanicRepositoryProvider
   }
 }
 
-String _$panicRepositoryHash() => r'c48fedbc011b7556146e04ac575201ade516d191';
+String _$panicRepositoryHash() => r'385ec676b19b2ed54ebccb7ed5ce692c022732b2';
 
 /// Main panic state notifier.
 /// Listens to trigger events and manages the panic flow.
@@ -358,7 +358,7 @@ final class PanicNotifierProvider
   }
 }
 
-String _$panicNotifierHash() => r'e564f1b548b49a33c53c2f6660371f77c787b7dc';
+String _$panicNotifierHash() => r'20dbb7e28c9833da473027ec48524b197b7bf7c7';
 
 /// Main panic state notifier.
 /// Listens to trigger events and manages the panic flow.

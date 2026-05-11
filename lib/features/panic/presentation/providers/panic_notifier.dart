@@ -6,15 +6,14 @@ library;
 
 import 'dart:async';
 import 'dart:io' show Platform;
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:my_panic/core/api/my_panic_api_client.dart';
 import 'package:my_panic/core/services/haptic_service.dart';
 import 'package:my_panic/core/services/location_service.dart';
 import 'package:my_panic/features/panic/data/panic_repository.dart';
 import 'package:my_panic/features/panic/domain/panic_state.dart';
 import 'package:my_panic/features/user_profile/presentation/providers/settings_provider.dart';
 
-import 'package:my_panic/features/panic/domain/entities/medical_profile.dart';
 import 'package:my_panic/features/trigger_engine/abstract_trigger_source.dart';
 import 'package:my_panic/features/trigger_engine/manual_trigger_source.dart';
 import 'package:my_panic/features/trigger_engine/composite_trigger_service.dart';
@@ -24,8 +23,6 @@ import 'package:my_panic/features/trigger_engine/shake_trigger_service.dart';
 import 'package:my_panic/features/trigger_engine/qs_tile_trigger_service.dart';
 import 'package:my_panic/features/trigger_engine/widget_trigger_service.dart';
 import 'package:my_panic/features/trigger_engine/trigger_settings_provider.dart';
-import 'package:my_panic/features/user_profile/data/contacts_repository.dart';
-import 'package:my_panic/features/user_profile/presentation/providers/medical_profile_provider.dart';
 
 part 'panic_notifier.g.dart';
 
@@ -97,10 +94,10 @@ LocationService locationService(Ref ref) {
   return LocationService();
 }
 
-/// Provides the PanicRepository.
+/// Provides the PanicRepository, wired to the typed MyPanic API client.
 @riverpod
 PanicRepository panicRepository(Ref ref) {
-  return PanicRepository();
+  return PanicRepository(ref.watch(myPanicApiClientProvider));
 }
 
 /// Main panic state notifier.
@@ -212,42 +209,22 @@ class PanicNotifier extends _$PanicNotifier {
     hapticService.stopVibration();
     hapticService.emergencyAlertFeedback();
 
-    state = PanicState.active(activatedAt: DateTime.now());
+    final activatedAt = DateTime.now();
+    state = PanicState.active(activatedAt: activatedAt);
 
     try {
-      // Get current location
       final position = await locationService.getCurrentLocation();
 
-      // Get emergency contacts
-      // Since watchContacts is a stream, we take the latest value
-      final contacts = await ref
-          .read(contactsRepositoryProvider)
-          .watchContacts()
-          .first;
-
-      // Get medical profile
-      final profile = ref.read(medicalProfileProvider);
-
-      if (contacts.isEmpty) {
-        // Fallback or warning? For now, we proceed but maybe log it?
-        // Or we could have a check before _activateAlert
-      }
-
-      // Send SMS to contacts
-      await panicRepository.sendSmsToContacts(
-        contacts: contacts,
-        location: position,
-      );
-
-      // Send to backend
+      // Backend owns SMS fan-out via SMSFlow + FanOutAlertJob; the client only
+      // POSTs the alert. Recipients are resolved server-side from the user's
+      // consented contacts.
       final alertStatus = await panicRepository.sendEmergencyAlert(
         location: position,
-        profile: profile ?? MedicalProfile(), // Handle null profile gracefully
-        contacts: contacts,
+        triggeredAt: activatedAt,
       );
 
       state = PanicState.active(
-        activatedAt: DateTime.now(),
+        activatedAt: activatedAt,
         alertId: alertStatus.alertId,
       );
     } catch (e) {
