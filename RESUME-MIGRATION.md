@@ -1,6 +1,6 @@
 # MyPanic Flutter — Firebase → Supabase Migration: Resume Document
 
-**Last session:** 2026-05-11. Migration Tasks 1–4 (incl. 4b/4c/4d) complete. Riverpod 2 → 4 + Freezed 2 → 3 upgrade done as forced collateral (Dart SDK 3.11 needed analyzer 7.x).
+**Last session:** 2026-05-11. Migration Tasks 1–5 complete (incl. 4b/4c/4d). Riverpod 2 → 4 + Freezed 2 → 3 upgrade done as forced collateral (Dart SDK 3.11 needed analyzer 7.x).
 
 ## Where to start next session
 
@@ -44,8 +44,9 @@ Read these sections first, in this order:
 | 4c: Signup awaiting-confirmation state | ✓ (this session) | New `signupAwaitingConfirmationProvider` (30s window) at `lib/features/auth/presentation/providers/auth_notifier.dart`. signup_screen calls `.mark()`. Router redirects `!isLoggedIn && awaitingConfirmation` → `/verify-email`. |
 | 4d: PKCE deep-link handling | ✓ (this session) | New `lib/core/auth/auth_link_handler.dart`. `app_links: ^6.3.2` in pubspec. AndroidManifest intent-filter for `io.kizuri.mypanic://auth-callback`. `_authLinkHandler` initialized in main.dart. **Pending external step:** in Supabase Studio → Authentication → URL Configuration, add `io.kizuri.mypanic://auth-callback` to Redirect URLs. |
 | Riverpod + Freezed upgrade (collateral) | ✓ (this session) | See notes below. |
+| 5: MyPanicApiClient + ApiException | ✓ (this session, commit `24fa8ff`) | 401-retry-once (override #4), `/health` misconfig probe (override #16), `Uri.resolveUri` joining (override #17). Provider is `keepAlive` so the http.Client is reused. `lib/core/api/{api_exception.dart,my_panic_api_client.dart}`. Analyzer clean. |
 
-## What's next (Tasks 5–10 per addendum renumbering)
+## What's next (Tasks 6–10 per addendum renumbering)
 
 Same as previous session's resume doc but with these adjustments learned this session:
 
@@ -58,8 +59,7 @@ Same as previous session's resume doc but with these adjustments learned this se
 
 | New # | Brief |
 |-------|-------|
-| 5 | `MyPanicApiClient` + `ApiException`. Bearer-token from `Supabase.instance.client.auth.currentSession?.accessToken`. 401-retry-once after `refreshSession()` per override #4. Misconfig `GET /health` HEAD at first instantiation per override #16. URI handling via `Uri.parse(...).resolveUri(...)` per override #17. |
-| 6 | `UserProfileRepository` on the API. `GET/PUT /profiles/me`. Null on 404. `watchUserProfile` polls + pauses on app-backgrounded via `WidgetsBindingObserver` per override #17. This task will also delete the `UserProfileRepositoryRef` reference at `user_profile_repository.dart:10` (use `Ref` instead). |
+| 6 | `UserProfileRepository` on the API. `GET/PUT /profiles/me`. Null on 404. `watchUserProfile` polls + pauses on app-backgrounded via `WidgetsBindingObserver` per override #17. This task will also delete the `UserProfileRepositoryRef` reference at `user_profile_repository.dart:10` (use `Ref` instead). Use the existing `myPanicApiClientProvider` to inject. |
 | 7 | `ContactsRepository` + `SyncService` REST-backed. Override #13 race fixes: `_syncLock` Completer; flush-then-sync ordering on connectivity restore; merge-not-replace when `hasPendingChanges()`. |
 | 8 (NEW, P0) | **PanicRepository → MyPanicApiClient.** `sendEmergencyAlert` becomes `await _api.post('/api/v1/alerts', {...})`. Generate `clientIdempotencyKey = const Uuid().v4()`. Drop `sendSmsToContacts`. Update `panic_notifier.dart`. |
 | 9 (NEW) | **xUnit-equivalent Flutter test project.** Add `mocktail` to dev_dependencies. Cover all 15 paths from the coverage diagram. **CRITICAL** test: `MyPanicApiClient` 401-retry. |
