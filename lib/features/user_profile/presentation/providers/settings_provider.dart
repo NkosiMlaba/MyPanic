@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Provider for the SharedPreferences instance
@@ -25,5 +26,5 @@ class SettingsNotifier extends StateNotifier<int> {
 /// Provider for settings (countdown duration for now)
 final settingsProvider = StateNotifierProvider<SettingsNotifier, int>((ref) {
   final prefsAsync = ref.watch(sharedPreferencesProvider);
-  return SettingsNotifier(prefsAsync.valueOrNull);
+  return SettingsNotifier(prefsAsync.value);
 });

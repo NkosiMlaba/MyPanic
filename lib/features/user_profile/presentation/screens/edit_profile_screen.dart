@@ -85,7 +85,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       final user = ref.read(authRepositoryProvider).currentUser;
       if (user == null) throw Exception('User not authenticated');
 
-      final currentProfile = ref.read(userProfileProvider).valueOrNull;
+      final currentProfile = ref.read(userProfileProvider).value;
 
       final medicalProfile = MedicalProfile(
         bloodType: _bloodTypeController.text.trim(),
@@ -99,8 +99,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       );
 
       final profile = UserProfile(
-        uid: user.uid,
-        email: user.email ?? '',
+        uid: user.id,
+        email: user.email,
         firstName: _firstNameController.text.trim(),
         lastName: _lastNameController.text.trim(),
         phoneNumber: _phoneController.text.trim(),

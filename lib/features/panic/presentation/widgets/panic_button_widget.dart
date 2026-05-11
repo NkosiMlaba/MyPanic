@@ -45,7 +45,7 @@ class _PanicButtonWidgetState extends ConsumerState<PanicButtonWidget>
     final hapticService = ref.read(hapticServiceProvider);
     hapticService.buttonPressFeedback();
 
-    ref.read(panicNotifierProvider.notifier).triggerPanic();
+    ref.read(panicProvider.notifier).triggerPanic();
   }
 
   @override

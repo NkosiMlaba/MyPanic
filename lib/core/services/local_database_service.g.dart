@@ -6,24 +6,53 @@ part of 'local_database_service.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+
+@ProviderFor(localDatabaseService)
+final localDatabaseServiceProvider = LocalDatabaseServiceProvider._();
+
+final class LocalDatabaseServiceProvider
+    extends
+        $FunctionalProvider<
+          LocalDatabaseService,
+          LocalDatabaseService,
+          LocalDatabaseService
+        >
+    with $Provider<LocalDatabaseService> {
+  LocalDatabaseServiceProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'localDatabaseServiceProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$localDatabaseServiceHash();
+
+  @$internal
+  @override
+  $ProviderElement<LocalDatabaseService> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  LocalDatabaseService create(Ref ref) {
+    return localDatabaseService(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(LocalDatabaseService value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<LocalDatabaseService>(value),
+    );
+  }
+}
+
 String _$localDatabaseServiceHash() =>
     r'299f3101e382ff740166017b133a0403d7e9978e';
-
-/// See also [localDatabaseService].
-@ProviderFor(localDatabaseService)
-final localDatabaseServiceProvider =
-    AutoDisposeProvider<LocalDatabaseService>.internal(
-      localDatabaseService,
-      name: r'localDatabaseServiceProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$localDatabaseServiceHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef LocalDatabaseServiceRef = AutoDisposeProviderRef<LocalDatabaseService>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

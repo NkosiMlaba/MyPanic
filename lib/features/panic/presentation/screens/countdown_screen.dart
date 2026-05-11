@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:my_panic/core/theme/app_theme.dart';
 
+import 'package:my_panic/features/panic/domain/panic_state.dart';
 import 'package:my_panic/features/panic/presentation/providers/panic_notifier.dart';
 import 'package:my_panic/features/user_profile/presentation/providers/settings_provider.dart';
 
@@ -17,13 +18,13 @@ class CountdownScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final panicState = ref.watch(panicNotifierProvider);
+    final panicState = ref.watch(panicProvider);
 
     // Get seconds remaining from state
-    final secondsRemaining = panicState.maybeWhen(
-      countingDown: (seconds, _) => seconds,
-      orElse: () => 0,
-    );
+    final secondsRemaining = switch (panicState) {
+      PanicStateCountingDown(secondsRemaining: final s) => s,
+      _ => 0,
+    };
 
     final totalDuration = ref.watch(settingsProvider);
     final progress = secondsRemaining / totalDuration;
@@ -157,7 +158,7 @@ class CountdownScreen extends ConsumerWidget {
               padding: const EdgeInsets.all(32),
               child: _SlideToCancel(
                 onCancel: () {
-                  ref.read(panicNotifierProvider.notifier).cancelPanic();
+                  ref.read(panicProvider.notifier).cancelPanic();
                 },
               ),
             ),

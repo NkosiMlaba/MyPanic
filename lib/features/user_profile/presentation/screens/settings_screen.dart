@@ -16,7 +16,7 @@ class SettingsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final userProfile = ref.watch(userProfileProvider).valueOrNull;
+    final userProfile = ref.watch(userProfileProvider).value;
 
     return Scaffold(
       backgroundColor: AppTheme.backgroundBrand,

@@ -4,6 +4,6 @@ import 'package:my_panic/features/user_profile/presentation/providers/user_profi
 
 /// Provides the current user's medical profile.
 final medicalProfileProvider = Provider<MedicalProfile?>((ref) {
-  final userProfile = ref.watch(userProfileProvider).valueOrNull;
+  final userProfile = ref.watch(userProfileProvider).value;
   return userProfile?.medicalProfile;
 });

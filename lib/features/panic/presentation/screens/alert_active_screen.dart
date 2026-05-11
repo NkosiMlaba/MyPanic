@@ -335,7 +335,7 @@ class AlertActiveScreen extends ConsumerWidget {
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
-              ref.read(panicNotifierProvider.notifier).reset();
+              ref.read(panicProvider.notifier).reset();
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.successGreen,

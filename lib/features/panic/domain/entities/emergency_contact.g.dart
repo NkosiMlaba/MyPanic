@@ -6,20 +6,18 @@ part of 'emergency_contact.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$EmergencyContactImpl _$$EmergencyContactImplFromJson(
-  Map<String, dynamic> json,
-) => _$EmergencyContactImpl(
-  id: json['id'] as String,
-  name: json['name'] as String,
-  phone: json['phone'] as String,
-  relationship: json['relationship'] as String,
-);
+_EmergencyContact _$EmergencyContactFromJson(Map<String, dynamic> json) =>
+    _EmergencyContact(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      phone: json['phone'] as String,
+      relationship: json['relationship'] as String,
+    );
 
-Map<String, dynamic> _$$EmergencyContactImplToJson(
-  _$EmergencyContactImpl instance,
-) => <String, dynamic>{
-  'id': instance.id,
-  'name': instance.name,
-  'phone': instance.phone,
-  'relationship': instance.relationship,
-};
+Map<String, dynamic> _$EmergencyContactToJson(_EmergencyContact instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'name': instance.name,
+      'phone': instance.phone,
+      'relationship': instance.relationship,
+    };

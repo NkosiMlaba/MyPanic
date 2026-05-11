@@ -6,22 +6,21 @@ part of 'alert_status.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$AlertStatusImpl _$$AlertStatusImplFromJson(Map<String, dynamic> json) =>
-    _$AlertStatusImpl(
-      alertId: json['alertId'] as String,
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      state: $enumDecode(_$AlertStateEnumMap, json['state']),
-      latitude: (json['latitude'] as num?)?.toDouble(),
-      longitude: (json['longitude'] as num?)?.toDouble(),
-      notifiedContacts:
-          (json['notifiedContacts'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toList() ??
-          const [],
-      errorMessage: json['errorMessage'] as String?,
-    );
+_AlertStatus _$AlertStatusFromJson(Map<String, dynamic> json) => _AlertStatus(
+  alertId: json['alertId'] as String,
+  createdAt: DateTime.parse(json['createdAt'] as String),
+  state: $enumDecode(_$AlertStateEnumMap, json['state']),
+  latitude: (json['latitude'] as num?)?.toDouble(),
+  longitude: (json['longitude'] as num?)?.toDouble(),
+  notifiedContacts:
+      (json['notifiedContacts'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList() ??
+      const [],
+  errorMessage: json['errorMessage'] as String?,
+);
 
-Map<String, dynamic> _$$AlertStatusImplToJson(_$AlertStatusImpl instance) =>
+Map<String, dynamic> _$AlertStatusToJson(_AlertStatus instance) =>
     <String, dynamic>{
       'alertId': instance.alertId,
       'createdAt': instance.createdAt.toIso8601String(),

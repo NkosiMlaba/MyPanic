@@ -6,6 +6,7 @@ library;
 /// (e.g. shake sensitivity) using SharedPreferences.
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io' show Platform;
 
@@ -96,5 +97,5 @@ class TriggerSettingsNotifier extends StateNotifier<TriggerSettings> {
 final triggerSettingsProvider =
     StateNotifierProvider<TriggerSettingsNotifier, TriggerSettings>((ref) {
   final prefsAsync = ref.watch(sharedPreferencesProvider);
-  return TriggerSettingsNotifier(prefsAsync.valueOrNull);
+  return TriggerSettingsNotifier(prefsAsync.value);
 });

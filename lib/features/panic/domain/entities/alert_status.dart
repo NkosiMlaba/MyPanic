@@ -11,7 +11,7 @@ part 'alert_status.g.dart';
 
 /// The status of an emergency alert.
 @freezed
-class AlertStatus with _$AlertStatus {
+abstract class AlertStatus with _$AlertStatus {
   const factory AlertStatus({
     required String alertId,
     required DateTime createdAt,

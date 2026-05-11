@@ -4,7 +4,7 @@ part 'emergency_contact.freezed.dart';
 part 'emergency_contact.g.dart';
 
 @freezed
-class EmergencyContact with _$EmergencyContact {
+abstract class EmergencyContact with _$EmergencyContact {
   const factory EmergencyContact({
     required String id,
     required String name,

@@ -77,7 +77,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final panicState = ref.watch(panicNotifierProvider);
+    final panicState = ref.watch(panicProvider);
 
     return Scaffold(
       backgroundColor: AppTheme.backgroundBrand,

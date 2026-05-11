@@ -6,25 +6,53 @@ part of 'user_profile_repository.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+
+@ProviderFor(userProfileRepository)
+final userProfileRepositoryProvider = UserProfileRepositoryProvider._();
+
+final class UserProfileRepositoryProvider
+    extends
+        $FunctionalProvider<
+          UserProfileRepository,
+          UserProfileRepository,
+          UserProfileRepository
+        >
+    with $Provider<UserProfileRepository> {
+  UserProfileRepositoryProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'userProfileRepositoryProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$userProfileRepositoryHash();
+
+  @$internal
+  @override
+  $ProviderElement<UserProfileRepository> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  UserProfileRepository create(Ref ref) {
+    return userProfileRepository(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(UserProfileRepository value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<UserProfileRepository>(value),
+    );
+  }
+}
+
 String _$userProfileRepositoryHash() =>
     r'cd0e4c9936b702202e1c54f5174f2e21d044c28b';
-
-/// See also [userProfileRepository].
-@ProviderFor(userProfileRepository)
-final userProfileRepositoryProvider =
-    AutoDisposeProvider<UserProfileRepository>.internal(
-      userProfileRepository,
-      name: r'userProfileRepositoryProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$userProfileRepositoryHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef UserProfileRepositoryRef =
-    AutoDisposeProviderRef<UserProfileRepository>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
