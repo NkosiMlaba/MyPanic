@@ -1,4 +1,3 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:my_panic/features/auth/presentation/providers/auth_notifier.dart';
 import 'package:my_panic/features/user_profile/data/user_profile_repository.dart';
 import 'package:my_panic/features/user_profile/domain/entities/user_profile.dart';
