@@ -1,23 +1,30 @@
-/// Offline-first sync service for contacts and user data.
+/// Offline-first sync service for contacts.
 library;
 
-///
-/// Orchestrates data synchronization between Firestore (source of truth)
-/// and the local SQLite cache. Handles:
-///
-/// - Periodic refresh (every 5 minutes)
+/// Orchestrates between MyPanic.Api (source of truth) and the local SQLite
+/// cache.
+/// - Periodic refresh (30s)
 /// - Sync on app load
-/// - Sync on connectivity restored
-/// - Immediate sync on data changes
+/// - Sync on connectivity restored (flush-then-sync, never overlapping)
 /// - Pending writes queue for offline mutations
 /// - Graceful degradation when network is unavailable
+///
+/// Override #13 race fixes layered onto the plan body:
+///   * single `_syncLock` Completer serializes flush vs sync — they never run
+///     concurrently, so a slow flush can't be wiped by a parallel sync
+///   * connectivity-restore handler runs flush THEN sync inside the lock
+///   * before we overwrite the cache with the server list, we check
+///     `hasPendingChanges()` and merge unflushed locals on top, so a 30s
+///     periodic sync can't erase the contact a user added 1s ago.
 
 import 'dart:async';
 import 'dart:convert';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'dart:developer' as developer;
+
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+import 'package:my_panic/core/api/my_panic_api_client.dart';
 import 'package:my_panic/core/services/connectivity_service.dart';
 import 'package:my_panic/core/services/local_database_service.dart';
 import 'package:my_panic/features/panic/domain/entities/emergency_contact.dart';
@@ -26,20 +33,17 @@ part 'sync_service.g.dart';
 
 @riverpod
 SyncService syncService(Ref ref) {
-  final localDb = ref.watch(localDatabaseServiceProvider);
-  final connectivity = ref.watch(connectivityServiceProvider);
   final service = SyncService(
-    localDb: localDb,
-    connectivity: connectivity,
-    firestore: FirebaseFirestore.instance,
-    auth: FirebaseAuth.instance,
+    localDb: ref.watch(localDatabaseServiceProvider),
+    connectivity: ref.watch(connectivityServiceProvider),
+    api: ref.watch(myPanicApiClientProvider),
+    supabase: Supabase.instance.client,
   );
   service.initialize();
-  ref.onDispose(() => service.dispose());
+  ref.onDispose(service.dispose);
   return service;
 }
 
-/// Provides a reactive stream of contacts count from the sync service.
 @riverpod
 Stream<int> contactsCount(Ref ref) {
   final syncService = ref.watch(syncServiceProvider);
@@ -49,19 +53,23 @@ Stream<int> contactsCount(Ref ref) {
 class SyncService {
   final LocalDatabaseService localDb;
   final ConnectivityService connectivity;
-  final FirebaseFirestore firestore;
-  final FirebaseAuth auth;
+  final MyPanicApiClient api;
+  final SupabaseClient supabase;
 
   Timer? _periodicTimer;
   StreamSubscription<bool>? _connectivitySubscription;
-  StreamSubscription<QuerySnapshot<EmergencyContact>>? _firestoreSubscription;
 
   final StreamController<int> _contactsCountController =
       StreamController<int>.broadcast();
   final StreamController<List<EmergencyContact>> _contactsController =
       StreamController<List<EmergencyContact>>.broadcast();
 
-  static const _refreshInterval = Duration(minutes: 5);
+  /// Override #13: single mutex that serializes sync vs flush. Either operation
+  /// completes the Completer in `finally`; a waiter that arrives mid-op awaits
+  /// the existing future and then takes the lock itself.
+  Completer<void>? _syncLock;
+
+  static const _refreshInterval = Duration(seconds: 30);
   static const _syncKey = 'contacts_last_sync';
 
   bool _initialized = false;
@@ -69,169 +77,136 @@ class SyncService {
   SyncService({
     required this.localDb,
     required this.connectivity,
-    required this.firestore,
-    required this.auth,
+    required this.api,
+    required this.supabase,
   });
 
-  /// Stream of contacts count — updates on every sync.
   Stream<int> get contactsCountStream => _contactsCountController.stream;
-
-  /// Stream of full contacts list — updates on every sync.
   Stream<List<EmergencyContact>> get contactsStream =>
       _contactsController.stream;
 
-  /// Initialize the sync service: load local cache, start listeners.
+  String? get _userId => supabase.auth.currentUser?.id;
+
   Future<void> initialize() async {
     if (_initialized) return;
     _initialized = true;
-
-    // 1. Emit cached data immediately
     await _emitCachedData();
-
-    // 2. Try an initial sync
     await syncContacts();
-
-    // 3. Start periodic refresh (every 5 minutes)
     _periodicTimer = Timer.periodic(_refreshInterval, (_) => syncContacts());
-
-    // 4. Listen for connectivity changes — sync when network returns
     _connectivitySubscription =
         connectivity.onConnectivityChanged.listen((isOnline) {
-      if (isOnline) {
-        _flushPendingChanges();
-        syncContacts();
-      }
+      if (!isOnline) return;
+      // Override #13: flush THEN sync, sequentially, inside the lock so they
+      // can't race each other or a periodic sync.
+      _withLock(() async {
+        await _flushPendingChangesLocked();
+        await _syncContactsLocked();
+      });
     });
-
-    // 5. Listen to Firestore real-time updates when online
-    _startFirestoreListener();
   }
 
-  /// Sync contacts from Firestore → local cache.
-  Future<void> syncContacts() async {
-    final uid = auth.currentUser?.uid;
-    if (uid == null) return;
+  /// Public entry point — periodic timer and explicit refresh callers go here.
+  /// Acquires the mutex so a concurrent flush can't be clobbered.
+  Future<void> syncContacts() => _withLock(_syncContactsLocked);
 
+  // ── Locking ─────────────────────────────────────────────────────────────
+
+  Future<void> _withLock(Future<void> Function() action) async {
+    while (_syncLock != null) {
+      try {
+        await _syncLock!.future;
+      } catch (_) {
+        // Previous holder failed; we still take the lock next.
+      }
+    }
+    final lock = _syncLock = Completer<void>();
+    try {
+      await action();
+      lock.complete();
+    } catch (e, st) {
+      lock.completeError(e, st);
+      rethrow;
+    } finally {
+      if (identical(_syncLock, lock)) _syncLock = null;
+    }
+  }
+
+  // ── Sync (locked) ───────────────────────────────────────────────────────
+
+  Future<void> _syncContactsLocked() async {
+    if (_userId == null) return;
     final isOnline = await connectivity.checkConnectivity();
     if (!isOnline) {
-      // Offline — just emit cached data
       await _emitCachedData();
       return;
     }
 
     try {
-      final snapshot = await firestore
-          .collection('users')
-          .doc(uid)
-          .collection('contacts')
-          .get(const GetOptions(source: Source.server))
-          .timeout(const Duration(seconds: 10));
+      final list = await api.get('/api/v1/contacts') as List<dynamic>;
+      final serverContacts = list
+          .cast<Map<String, dynamic>>()
+          .map(_contactFromJson)
+          .toList(growable: false);
 
-      final contacts = snapshot.docs.map((doc) {
-        final data = doc.data();
-        return EmergencyContact(
-          id: doc.id,
-          name: data['name'] as String? ?? '',
-          phone: data['phone'] as String? ?? '',
-          relationship: data['relationship'] as String? ?? '',
-        );
-      }).toList();
+      // Override #13: if the user has unflushed local writes, MERGE the server
+      // list with cache instead of replacing — otherwise a periodic sync can
+      // erase a contact added a second ago. Local additions/updates win until
+      // they're flushed; the next sync after a successful flush converges.
+      final mergedContacts = await _mergeIfPending(serverContacts);
 
-      // Update local cache
-      await localDb.replaceContacts(contacts);
+      await localDb.replaceContacts(mergedContacts);
       await localDb.setLastSyncTime(_syncKey, DateTime.now());
-
-      // Emit updated data
-      _contactsController.add(contacts);
-      _contactsCountController.add(contacts.length);
-    } catch (e) {
-      // Network error or timeout — fall back to cache
-      print('[SyncService] syncContacts failed: $e — using cache');
+      _contactsController.add(mergedContacts);
+      _contactsCountController.add(mergedContacts.length);
+    } catch (e, st) {
+      developer.log(
+        'syncContacts failed; falling back to cache',
+        name: 'SyncService',
+        error: e,
+        stackTrace: st,
+      );
       await _emitCachedData();
     }
   }
 
-  /// Start listening to Firestore real-time updates.
-  void _startFirestoreListener() {
-    final uid = auth.currentUser?.uid;
-    if (uid == null) return;
+  /// If pending changes exist, replay the local cache view on top of the
+  /// server list (locals win for any id present in both; locals-only stay).
+  Future<List<EmergencyContact>> _mergeIfPending(
+    List<EmergencyContact> serverContacts,
+  ) async {
+    if (!await localDb.hasPendingChanges()) return serverContacts;
 
-    _firestoreSubscription?.cancel();
-    _firestoreSubscription = firestore
-        .collection('users')
-        .doc(uid)
-        .collection('contacts')
-        .withConverter<EmergencyContact>(
-          fromFirestore: (snap, _) => EmergencyContact.fromJson(snap.data()!),
-          toFirestore: (c, _) => c.toJson(),
-        )
-        .snapshots()
-        .listen(
-      (snapshot) async {
-        final contacts = snapshot.docs.map((doc) => doc.data()).toList();
-        await localDb.replaceContacts(contacts);
-        await localDb.setLastSyncTime(_syncKey, DateTime.now());
-        _contactsController.add(contacts);
-        _contactsCountController.add(contacts.length);
-      },
-      onError: (e) {
-        print('[SyncService] Firestore listener error: $e');
-      },
-    );
+    final localContacts = await localDb.getCachedContacts();
+    final byId = <String, EmergencyContact>{
+      for (final c in serverContacts) c.id: c,
+    };
+    for (final local in localContacts) {
+      byId[local.id] = local;
+    }
+    return byId.values.toList(growable: false);
   }
 
-  /// Emit data from the local cache.
   Future<void> _emitCachedData() async {
     try {
       final contacts = await localDb.getCachedContacts();
       _contactsController.add(contacts);
       _contactsCountController.add(contacts.length);
-    } catch (e) {
-      // Database not ready yet — emit empty
-      _contactsController.add([]);
+    } catch (_) {
+      _contactsController.add(<EmergencyContact>[]);
       _contactsCountController.add(0);
     }
   }
 
-  // ── Offline Writes ─────────────────────────────────────────────────────
+  // ── Writes ──────────────────────────────────────────────────────────────
 
-  /// Add a contact — writes to Firestore immediately if online,
-  /// otherwise queues for later sync.
-  Future<void> addContact(EmergencyContact contact) async {
-    final uid = auth.currentUser?.uid;
-    if (uid == null) return;
+  Future<void> addContact(EmergencyContact c) => _upsert(c, 'add');
+  Future<void> updateContact(EmergencyContact c) => _upsert(c, 'update');
 
-    // Always update local cache immediately
-    final contacts = await localDb.getCachedContacts();
-    contacts.add(contact);
-    await localDb.replaceContacts(contacts);
-    await _emitCachedData();
+  Future<void> _upsert(EmergencyContact contact, String op) async {
+    if (_userId == null) return;
 
-    final isOnline = await connectivity.checkConnectivity();
-    if (isOnline) {
-      try {
-        await firestore
-            .collection('users')
-            .doc(uid)
-            .collection('contacts')
-            .doc(contact.id)
-            .set(contact.toJson())
-            .timeout(const Duration(seconds: 5));
-      } catch (e) {
-        // Failed — queue for later
-        await _queueContactChange('add', contact);
-      }
-    } else {
-      await _queueContactChange('add', contact);
-    }
-  }
-
-  /// Update a contact — writes to Firestore immediately if online.
-  Future<void> updateContact(EmergencyContact contact) async {
-    final uid = auth.currentUser?.uid;
-    if (uid == null) return;
-
-    // Update local cache immediately
+    // 1. Local cache wins immediately so the UI updates without waiting on
+    // the network.
     final contacts = await localDb.getCachedContacts();
     final idx = contacts.indexWhere((c) => c.id == contact.id);
     if (idx >= 0) {
@@ -242,30 +217,22 @@ class SyncService {
     await localDb.replaceContacts(contacts);
     await _emitCachedData();
 
+    // 2. Push to API if online; queue otherwise. Note this does NOT take the
+    // sync lock — concurrent reads (sync) are safe because of the merge step.
     final isOnline = await connectivity.checkConnectivity();
     if (isOnline) {
       try {
-        await firestore
-            .collection('users')
-            .doc(uid)
-            .collection('contacts')
-            .doc(contact.id)
-            .set(contact.toJson(), SetOptions(merge: true))
-            .timeout(const Duration(seconds: 5));
-      } catch (e) {
-        await _queueContactChange('update', contact);
+        await api.put('/api/v1/contacts', _toUpsertRequest(contact));
+      } catch (_) {
+        await _queue(op, contact);
       }
     } else {
-      await _queueContactChange('update', contact);
+      await _queue(op, contact);
     }
   }
 
-  /// Delete a contact — removes from Firestore immediately if online.
   Future<void> deleteContact(String contactId) async {
-    final uid = auth.currentUser?.uid;
-    if (uid == null) return;
-
-    // Remove from local cache immediately
+    if (_userId == null) return;
     final contacts = await localDb.getCachedContacts();
     contacts.removeWhere((c) => c.id == contactId);
     await localDb.replaceContacts(contacts);
@@ -274,94 +241,106 @@ class SyncService {
     final isOnline = await connectivity.checkConnectivity();
     if (isOnline) {
       try {
-        await firestore
-            .collection('users')
-            .doc(uid)
-            .collection('contacts')
-            .doc(contactId)
-            .delete()
-            .timeout(const Duration(seconds: 5));
-      } catch (e) {
-        await _queueContactDelete(contactId);
+        await api.delete('/api/v1/contacts/$contactId');
+      } catch (_) {
+        await _queueDelete(contactId);
       }
     } else {
-      await _queueContactDelete(contactId);
+      await _queueDelete(contactId);
     }
   }
 
-  Future<void> _queueContactChange(
-      String operation, EmergencyContact contact) async {
+  // ── Pending writes ──────────────────────────────────────────────────────
+
+  Future<void> _queue(String op, EmergencyContact c) async {
     await localDb.addPendingChange(
       entityType: 'contact',
-      entityId: contact.id,
-      operation: operation,
-      payload: jsonEncode(contact.toJson()),
+      entityId: c.id,
+      operation: op,
+      payload: jsonEncode(_toUpsertRequest(c)),
     );
   }
 
-  Future<void> _queueContactDelete(String contactId) async {
+  Future<void> _queueDelete(String id) async {
     await localDb.addPendingChange(
       entityType: 'contact',
-      entityId: contactId,
+      entityId: id,
       operation: 'delete',
     );
   }
 
-  /// Flush all pending changes to Firestore.
-  Future<void> _flushPendingChanges() async {
-    final uid = auth.currentUser?.uid;
-    if (uid == null) return;
-
+  Future<void> _flushPendingChangesLocked() async {
+    if (_userId == null) return;
     final pending = await localDb.getPendingChanges();
     if (pending.isEmpty) return;
 
-    print('[SyncService] Flushing ${pending.length} pending changes');
+    developer.log(
+      'flushing ${pending.length} pending change(s)',
+      name: 'SyncService',
+    );
 
     for (final change in pending) {
-      final entityType = change['entity_type'] as String;
-      if (entityType != 'contact') continue;
-
+      if (change['entity_type'] != 'contact') continue;
       final entityId = change['entity_id'] as String;
-      final operation = change['operation'] as String;
+      final op = change['operation'] as String;
       final payload = change['payload'] as String?;
       final changeId = change['id'] as int;
 
       try {
-        final ref = firestore
-            .collection('users')
-            .doc(uid)
-            .collection('contacts')
-            .doc(entityId);
-
-        switch (operation) {
+        switch (op) {
           case 'add':
           case 'update':
             if (payload != null) {
               final data = jsonDecode(payload) as Map<String, dynamic>;
-              await ref
-                  .set(data, SetOptions(merge: true))
-                  .timeout(const Duration(seconds: 5));
+              await api.put('/api/v1/contacts', data);
             }
           case 'delete':
-            await ref.delete().timeout(const Duration(seconds: 5));
+            await api.delete('/api/v1/contacts/$entityId');
         }
-
         await localDb.removePendingChange(changeId);
-      } catch (e) {
-        // Stop flushing on error — will retry on next connectivity change
-        print('[SyncService] Failed to flush change $changeId: $e');
+      } catch (e, st) {
+        // Stop flushing on first failure so we keep ordering. The next
+        // connectivity-up event retries the same queue.
+        developer.log(
+          'flush failed for $changeId — aborting batch',
+          name: 'SyncService',
+          error: e,
+          stackTrace: st,
+        );
         break;
       }
     }
   }
 
-  /// Get the last sync time.
+  // ── Wire-format adapters ────────────────────────────────────────────────
+
+  EmergencyContact _contactFromJson(Map<String, dynamic> json) {
+    return EmergencyContact(
+      id: json['id'] as String,
+      name: (json['name'] as String?) ?? '',
+      phone: (json['phone'] as String?) ?? '',
+      relationship: (json['relationship'] as String?) ?? '',
+    );
+  }
+
+  Map<String, dynamic> _toUpsertRequest(EmergencyContact c) {
+    final relationship = c.relationship.isEmpty ? null : c.relationship;
+    return {
+      'id': c.id,
+      'name': c.name,
+      'phone': c.phone,
+      'relationship': relationship,
+      'priority': 0,
+    };
+  }
+
+  // ── Lifecycle ───────────────────────────────────────────────────────────
+
   Future<DateTime?> getLastSyncTime() => localDb.getLastSyncTime(_syncKey);
 
   void dispose() {
     _periodicTimer?.cancel();
     _connectivitySubscription?.cancel();
-    _firestoreSubscription?.cancel();
     _contactsCountController.close();
     _contactsController.close();
     _initialized = false;

@@ -48,19 +48,14 @@ final class SyncServiceProvider
   }
 }
 
-String _$syncServiceHash() => r'647c895c03eab881e14cc07cd1493cbf6f50da76';
-
-/// Provides a reactive stream of contacts count from the sync service.
+String _$syncServiceHash() => r'd547da44ae877d2e089e58861e9cb5e219b1f5e4';
 
 @ProviderFor(contactsCount)
 final contactsCountProvider = ContactsCountProvider._();
 
-/// Provides a reactive stream of contacts count from the sync service.
-
 final class ContactsCountProvider
     extends $FunctionalProvider<AsyncValue<int>, int, Stream<int>>
     with $FutureModifier<int>, $StreamProvider<int> {
-  /// Provides a reactive stream of contacts count from the sync service.
   ContactsCountProvider._()
     : super(
         from: null,
