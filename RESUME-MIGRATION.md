@@ -19,8 +19,8 @@ Read these sections first, in this order:
 ## The backend is already deployed
 
 `MyPanic.Api` shipped at `v0.1.0-foundation` (image `ghcr.io/antoinekizuri/mypanic-api:0.1.0-foundation`). All 13 endpoints from the foundation plan work. For Tasks 5–8 to be smoke-testable end-to-end:
-- **Android emulator:** `MYPANIC_API_BASE_URL=http://10.0.2.2:5187`
-- **Real Android device on same WiFi:** dev machine's LAN IP (`http://192.168.1.X:5187`)
+- **Android emulator:** `MYPANIC_API_BASE_URL=http://10.0.2.2:5035`
+- **Real Android device on same WiFi:** dev machine's LAN IP (`http://192.168.1.X:5035`)
 
 ## Repo state at checkpoint (2026-05-11 session 2 end)
 
@@ -65,7 +65,7 @@ Same as previous session's resume doc but with these adjustments learned this se
 
 | New # | Brief |
 |-------|-------|
-| 11 | **End-to-end smoke test on real Huawei device. Manual — needs your phone.** Steps: (1) Confirm `MyPanic.Api` is running and reachable from the phone — `curl http://<LAN-IP>:5187/health` from the phone's browser should return `{"status":"ok"}`. Open Windows Defender Firewall to allow inbound 5187 on private networks if needed. (2) `flutter run -d MPK0222525000545 --dart-define=SUPABASE_URL=https://<your>.supabase.co --dart-define=SUPABASE_ANON_KEY=eyJ... --dart-define=MYPANIC_API_BASE_URL=http://<LAN-IP>:5187`. (3) Verify the addendum's H. checklist: signup → verification email → click link → app picks up session → onboarding (Supabase Studio Redirect URL must include `io.kizuri.mypanic://auth-callback`); panic button → 202 from `MyPanic.Api` (check API logs) → SMS arrives via SMSFlow sandbox; password-reset deep-link round-trip works. |
+| 11 | **End-to-end smoke test on real Huawei device. Manual — needs your phone.** Steps: (1) Confirm `MyPanic.Api` is running and reachable from the phone — `curl http://<LAN-IP>:5035/health` from the phone's browser should return `{"status":"ok"}`. Open Windows Defender Firewall to allow inbound 5035 on private networks if needed. (2) `flutter run -d MPK0222525000545 --dart-define=SUPABASE_URL=https://<your>.supabase.co --dart-define=SUPABASE_ANON_KEY=eyJ... --dart-define=MYPANIC_API_BASE_URL=http://<LAN-IP>:5035`. (3) Verify the addendum's H. checklist: signup → verification email → click link → app picks up session → onboarding (Supabase Studio Redirect URL must include `io.kizuri.mypanic://auth-callback`); panic button → 202 from `MyPanic.Api` (check API logs) → SMS arrives via SMSFlow sandbox; password-reset deep-link round-trip works. |
 
 ## Discipline used this session
 

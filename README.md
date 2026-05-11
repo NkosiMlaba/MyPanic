@@ -17,15 +17,15 @@ dart run build_runner build --delete-conflicting-outputs
 flutter run -d <device-id> \
   --dart-define=SUPABASE_URL=https://<your-project>.supabase.co \
   --dart-define=SUPABASE_ANON_KEY=eyJ... \
-  --dart-define=MYPANIC_API_BASE_URL=http://10.0.2.2:5187
+  --dart-define=MYPANIC_API_BASE_URL=http://10.0.2.2:5035
 ```
 
 `MYPANIC_API_BASE_URL` per environment:
-- **Android emulator** → `http://10.0.2.2:5187` (10.0.2.2 is how the
+- **Android emulator** → `http://10.0.2.2:5035` (10.0.2.2 is how the
   emulator reaches the dev machine's localhost).
-- **Real device on the same Wi-Fi** → `http://<dev-LAN-IP>:5187`
-  (e.g. `http://192.168.1.50:5187`). Open Windows Defender Firewall to
-  allow inbound 5187 on private networks.
+- **Real device on the same Wi-Fi** → `http://<dev-LAN-IP>:5035`
+  (e.g. `http://192.168.1.50:5035`). Open Windows Defender Firewall to
+  allow inbound 5035 on private networks.
 - **Production** → whatever the deployed `MyPanic.Api` URL is.
 
 `flutter devices` lists attached devices. Convenience IDs we use:
