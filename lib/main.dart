@@ -7,7 +7,8 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:my_panic/core/api/api_options.dart';
 import 'package:my_panic/core/theme/app_theme.dart';
 import 'package:my_panic/core/router/app_router.dart';
 
@@ -16,11 +17,29 @@ import 'package:my_panic/core/utils/riverpod_logger.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Firebase
-  // Note: asking user to provide google-services.json, so we use DefaultFirebaseOptions if available,
-  // or fall back to platform default (which uses google-services.json on Android).
-  // For now, valid android setup relies on google-services.json being present.
-  await Firebase.initializeApp();
+  // Validate config — fail fast if --dart-define values are missing.
+  ApiOptions.assertConfigured();
+
+  await Supabase.initialize(
+    url: ApiOptions.supabaseUrl,
+    anonKey: ApiOptions.supabaseAnonKey,
+    // Persist session in shared_preferences (already a dep)
+    authOptions: const FlutterAuthClientOptions(
+      authFlowType: AuthFlowType.pkce,
+    ),
+  );
+
+  // Override #5: validate session at boot. If a persisted session exists
+  // but is expired, try a refresh; on failure, sign out cleanly so the
+  // app starts in the logged-out state instead of with stale creds.
+  final session = Supabase.instance.client.auth.currentSession;
+  if (session != null && session.isExpired) {
+    try {
+      await Supabase.instance.client.auth.refreshSession();
+    } catch (_) {
+      await Supabase.instance.client.auth.signOut();
+    }
+  }
 
   // Lock to portrait mode for consistent UX
   SystemChrome.setPreferredOrientations([
