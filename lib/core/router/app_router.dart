@@ -49,21 +49,24 @@ class AppRoutes {
 @riverpod
 GoRouter goRouter(Ref ref) {
   // Watch auth state to trigger redirects
-  final authState = ref.watch(authNotifierProvider);
+  final authState = ref.watch(authProvider);
+  // Transient flag set after signUp when Supabase returns a null session
+  // because email confirmation is enabled.
+  final awaitingConfirmation = ref.watch(signupAwaitingConfirmationProvider);
   // Watch user profile state
   final userProfileState = ref.watch(userProfileProvider);
   // Watch panic state for panic flow redirects
-  final panicState = ref.watch(panicNotifierProvider);
+  final panicState = ref.watch(panicProvider);
 
   return GoRouter(
     initialLocation: AppRoutes.home,
     debugLogDiagnostics: true,
     observers: [RouterLogger()],
     redirect: (context, state) {
-      final isLoggedIn = authState.valueOrNull != null;
-      final isVerified = authState.valueOrNull?.emailVerified ?? false;
+      final isLoggedIn = authState.value != null;
+      final isVerified = authState.value?.emailVerified ?? false;
 
-      final userProfile = userProfileState.valueOrNull;
+      final userProfile = userProfileState.value;
       // A profile is considered complete if the flag is set OR if the document
       // exists and has a firstName (handles accounts predating the flag).
       final isProfileComplete =
@@ -80,8 +83,16 @@ GoRouter goRouter(Ref ref) {
       final isAuthRoute =
           isLoginRoute || isSignUpRoute || isForgotPasswordRoute;
 
-      // 1. If not logged in, force login (unless on an auth route)
+      // 1. If not logged in, force login — except just after signUp when
+      // Supabase returns null session (email confirmation enabled).
+      // In that case, route to /verify-email so the user knows to check email.
       if (!isLoggedIn) {
+        if (awaitingConfirmation && !isVerifyEmailRoute) {
+          return AppRoutes.verifyEmail;
+        }
+        if (awaitingConfirmation && isVerifyEmailRoute) {
+          return null;
+        }
         return isAuthRoute ? null : AppRoutes.login;
       }
 
@@ -100,7 +111,7 @@ GoRouter goRouter(Ref ref) {
       );
       print('[Router] userProfileState.hasValue: ${userProfileState.hasValue}');
       print(
-        '[Router] userProfileState.valueOrNull: ${userProfileState.valueOrNull}',
+        '[Router] userProfileState.value: ${userProfileState.value}',
       );
       print('[Router] isProfileComplete: $isProfileComplete');
 

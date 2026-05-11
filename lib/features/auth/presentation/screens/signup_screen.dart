@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:my_panic/core/theme/app_theme.dart';
 import 'package:my_panic/features/auth/data/auth_repository.dart';
+import 'package:my_panic/features/auth/presentation/providers/auth_notifier.dart';
 
 class SignUpScreen extends ConsumerStatefulWidget {
   const SignUpScreen({super.key});
@@ -48,6 +49,10 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
         _emailController.text.trim(),
         _passwordController.text.trim(),
       );
+      // Supabase returns a null session when email confirmation is enabled.
+      // Flag the transient state so the router routes to /verify-email even
+      // without an active session.
+      ref.read(signupAwaitingConfirmationProvider.notifier).mark();
     } catch (e) {
       setState(() {
         _errorMessage = e.toString();

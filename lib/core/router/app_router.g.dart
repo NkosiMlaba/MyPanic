@@ -6,24 +6,50 @@ part of 'app_router.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$goRouterHash() => r'0e8206b61789a068cf876ccbda25e168e83a7959';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+/// Provides the GoRouter instance.
+
+@ProviderFor(goRouter)
+final goRouterProvider = GoRouterProvider._();
 
 /// Provides the GoRouter instance.
-///
-/// Copied from [goRouter].
-@ProviderFor(goRouter)
-final goRouterProvider = AutoDisposeProvider<GoRouter>.internal(
-  goRouter,
-  name: r'goRouterProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$goRouterHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef GoRouterRef = AutoDisposeProviderRef<GoRouter>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+final class GoRouterProvider
+    extends $FunctionalProvider<GoRouter, GoRouter, GoRouter>
+    with $Provider<GoRouter> {
+  /// Provides the GoRouter instance.
+  GoRouterProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'goRouterProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$goRouterHash();
+
+  @$internal
+  @override
+  $ProviderElement<GoRouter> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  GoRouter create(Ref ref) {
+    return goRouter(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(GoRouter value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<GoRouter>(value),
+    );
+  }
+}
+
+String _$goRouterHash() => r'cb2bfd58f2b790bd4fdfabc53143970a65d386c4';

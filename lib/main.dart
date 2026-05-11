@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:my_panic/core/api/api_options.dart';
+import 'package:my_panic/core/auth/auth_link_handler.dart';
 import 'package:my_panic/core/theme/app_theme.dart';
 import 'package:my_panic/core/router/app_router.dart';
 
@@ -41,6 +42,11 @@ void main() async {
     }
   }
 
+  // Override #14 / Task 4d: handle PKCE deep-links (password-reset,
+  // email-confirmation). The handler must outlive any one screen, so we
+  // hold the reference on a long-lived top-level field.
+  _authLinkHandler = AuthLinkHandler()..start();
+
   // Lock to portrait mode for consistent UX
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
@@ -61,6 +67,10 @@ void main() async {
     ProviderScope(observers: [RiverpodLogger()], child: const MyPanicApp()),
   );
 }
+
+// Holds the lifetime-of-app deep-link subscription so it isn't GC'd.
+// ignore: unused_element
+AuthLinkHandler? _authLinkHandler;
 
 /// Main application widget.
 class MyPanicApp extends ConsumerWidget {

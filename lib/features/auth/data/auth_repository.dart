@@ -1,66 +1,92 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:developer' as developer;
+
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:my_panic/features/auth/data/app_user.dart';
 
 part 'auth_repository.g.dart';
 
 @riverpod
-AuthRepository authRepository(AuthRepositoryRef ref) {
-  return AuthRepository(FirebaseAuth.instance);
+AuthRepository authRepository(Ref ref) {
+  return AuthRepository(Supabase.instance.client);
 }
 
 class AuthRepository {
-  final FirebaseAuth _firebaseAuth;
+  final SupabaseClient _client;
 
-  AuthRepository(this._firebaseAuth);
+  AuthRepository(this._client);
 
-  Stream<User?> get authStateChanges => _firebaseAuth.authStateChanges();
-
-  Stream<User?> get userChanges => _firebaseAuth.userChanges();
-
-  User? get currentUser => _firebaseAuth.currentUser;
-
-  Future<UserCredential> signInWithEmailAndPassword(
-    String email,
-    String password,
-  ) async {
-    return await _firebaseAuth.signInWithEmailAndPassword(
-      email: email,
-      password: password,
+  AppUser? _toAppUser(User? u) {
+    if (u == null) return null;
+    return AppUser(
+      id: u.id,
+      email: u.email ?? '',
+      emailVerified: u.emailConfirmedAt != null,
     );
   }
 
-  Future<UserCredential> createUserWithEmailAndPassword(
+  /// Emits on every auth state change (sign-in, sign-out, token refresh).
+  /// Token-refresh failures are swallowed so they cannot crash the app.
+  Stream<AppUser?> get authStateChanges => _client.auth.onAuthStateChange
+      .handleError((Object e, StackTrace st) {
+        developer.log(
+          'authStateChanges error (swallowed)',
+          name: 'AuthRepository',
+          error: e,
+          stackTrace: st,
+        );
+      })
+      .map((event) => _toAppUser(event.session?.user));
+
+  /// Firebase distinguished userChanges (fires on email-verification etc.)
+  /// from authStateChanges. Supabase doesn't expose a perfect equivalent;
+  /// onAuthStateChange covers our use cases.
+  Stream<AppUser?> get userChanges => authStateChanges;
+
+  AppUser? get currentUser => _toAppUser(_client.auth.currentUser);
+
+  Future<void> signInWithEmailAndPassword(String email, String password) async {
+    await _client.auth.signInWithPassword(email: email, password: password);
+  }
+
+  Future<void> createUserWithEmailAndPassword(
     String email,
     String password,
   ) async {
-    return await _firebaseAuth.createUserWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
+    await _client.auth.signUp(email: email, password: password);
   }
 
+  /// Supabase emails the reset link. The redirect URL is configured in
+  /// Supabase Studio → Authentication → URL Configuration.
   Future<void> sendPasswordResetEmail(String email) async {
-    await _firebaseAuth.sendPasswordResetEmail(email: email);
+    await _client.auth.resetPasswordForEmail(email);
   }
 
   Future<void> signOut() async {
-    await _firebaseAuth.signOut();
+    await _client.auth.signOut();
   }
 
+  /// No direct reauthenticate-with-credentials API in Supabase; re-call
+  /// signInWithPassword. Throws on bad password.
   Future<void> reauthenticate(String password) async {
-    final user = _firebaseAuth.currentUser;
-    if (user == null || user.email == null) throw Exception('No user found');
-
-    final credential = EmailAuthProvider.credential(
-      email: user.email!,
-      password: password,
-    );
-    await user.reauthenticateWithCredential(credential);
+    final email = currentUser?.email;
+    if (email == null || email.isEmpty) {
+      throw StateError('No user signed in');
+    }
+    await _client.auth.signInWithPassword(email: email, password: password);
   }
 
   Future<void> updatePassword(String newPassword) async {
-    final user = _firebaseAuth.currentUser;
-    if (user == null) throw Exception('No user found');
-    await user.updatePassword(newPassword);
+    await _client.auth.updateUser(UserAttributes(password: newPassword));
   }
-} // TODO: Add more auth methods as needed
+
+  /// Resend the signup confirmation email. Used by verify_email_screen.
+  Future<void> resendSignupConfirmation(String email) async {
+    await _client.auth.resend(type: OtpType.signup, email: email);
+  }
+
+  /// Refresh the session; useful while polling for email verification.
+  Future<void> refreshSession() async {
+    await _client.auth.refreshSession();
+  }
+}

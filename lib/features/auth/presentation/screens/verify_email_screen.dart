@@ -20,9 +20,10 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
   void initState() {
     super.initState();
 
-    final user = ref.read(authRepositoryProvider).currentUser;
-    if (user != null && !user.emailVerified) {
-      user.sendEmailVerification();
+    final authRepo = ref.read(authRepositoryProvider);
+    final user = authRepo.currentUser;
+    if (user != null && !user.emailVerified && user.email.isNotEmpty) {
+      authRepo.resendSignupConfirmation(user.email);
     }
 
     _timer = Timer.periodic(
@@ -39,24 +40,31 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
 
   Future<void> _checkEmailVerified() async {
     final authRepo = ref.read(authRepositoryProvider);
-    final user = authRepo.currentUser;
+    if (authRepo.currentUser == null) return;
 
-    if (user != null) {
-      await user.reload();
-      if (user.emailVerified) {
-        _timer?.cancel();
-        if (mounted) {
-          ref.invalidate(authNotifierProvider);
-        }
+    try {
+      await authRepo.refreshSession();
+    } catch (e) {
+      debugPrint('refreshSession failed during email-verify poll: $e');
+      return;
+    }
+
+    final refreshed = authRepo.currentUser;
+    if (refreshed != null && refreshed.emailVerified) {
+      _timer?.cancel();
+      if (mounted) {
+        ref.read(signupAwaitingConfirmationProvider.notifier).clear();
+        ref.invalidate(authProvider);
       }
     }
   }
 
   Future<void> _resendVerificationEmail() async {
     try {
-      final user = ref.read(authRepositoryProvider).currentUser;
-      if (user != null && !user.emailVerified) {
-        await user.sendEmailVerification();
+      final authRepo = ref.read(authRepositoryProvider);
+      final user = authRepo.currentUser;
+      if (user != null && !user.emailVerified && user.email.isNotEmpty) {
+        await authRepo.resendSignupConfirmation(user.email);
         setState(() => _canResendEmail = false);
         await Future.delayed(const Duration(seconds: 5));
         if (mounted) setState(() => _canResendEmail = true);
@@ -103,6 +111,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
             const SizedBox(height: 16),
             TextButton(
               onPressed: () async {
+                ref.read(signupAwaitingConfirmationProvider.notifier).clear();
                 await ref.read(authRepositoryProvider).signOut();
               },
               child: const Text('Cancel / Sign Out'),
