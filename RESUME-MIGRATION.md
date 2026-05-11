@@ -1,6 +1,6 @@
 # MyPanic Flutter — Firebase → Supabase Migration: Resume Document
 
-**Last session:** 2026-05-11. Migration Tasks 1–6 complete (incl. 4b/4c/4d). Riverpod 2 → 4 + Freezed 2 → 3 upgrade done as forced collateral (Dart SDK 3.11 needed analyzer 7.x).
+**Last session:** 2026-05-11. Migration Tasks 1–8 complete (incl. 4b/4c/4d). All Firebase imports gone from `lib/` (only an `app_user.dart` doc-comment historical reference remains). Riverpod 2 → 4 + Freezed 2 → 3 upgrade done as forced collateral (Dart SDK 3.11 needed analyzer 7.x).
 
 ## Where to start next session
 
@@ -46,8 +46,10 @@ Read these sections first, in this order:
 | Riverpod + Freezed upgrade (collateral) | ✓ (this session) | See notes below. |
 | 5: MyPanicApiClient + ApiException | ✓ (this session, commit `24fa8ff`) | 401-retry-once (override #4), `/health` misconfig probe (override #16), `Uri.resolveUri` joining (override #17). Provider is `keepAlive` so the http.Client is reused. `lib/core/api/{api_exception.dart,my_panic_api_client.dart}`. Analyzer clean. |
 | 6: UserProfileRepository on the API | ✓ (this session, commit `c40cdfe`) | `GET/PUT /api/v1/profiles/me` via `MyPanicApiClient`. Wire-shape adapter: in-app `UserProfile`/`MedicalProfile` (nested + list allergies/conditions) ↔ API flat `ProfileResponse`/`UpdateProfileRequest` (comma-joined string allergies/conditions). UID is read from `authUserId`, falling back to current Supabase session. **Lossy fields (dropped on write, defaulted on read):** `medications`, `emergencyNotes`, `insuranceInfo`, `doctorName`, `doctorPhone`, `countdownDuration` — accepted trade-off, v0.1.0-foundation API doesn't expose them. `watchUserProfile()` is a `_PausablePollStream` (30s) that observes `WidgetsBindingObserver` and goes quiet on `paused`/`hidden`/`detached`, with an immediate refresh on foreground (override #17). Analyzer clean on Task 6 + auth + api + main.dart scope. |
+| 7: ContactsRepository + SyncService REST-backed | ✓ (this session, commit `a4040f8`) | `GET /api/v1/contacts` (30s poll + on connectivity restore) + `PUT /api/v1/contacts` + `DELETE /api/v1/contacts/{id}` via `MyPanicApiClient`. SQLite cache + pending-changes queue retained as offline source of truth. **Override #13 race fixes:** single `_syncLock` Completer serializes flush vs sync; connectivity-restore handler runs flush THEN sync inside the lock; before `replaceContacts`, syncContacts checks `hasPendingChanges()` and merges unflushed locals (locals win by id) so a 30s sync can't erase a 1s-old addition. Wire adapter: `relationship` empty→null on write/null→`''` on read; `priority` defaults 0; `consentedAt`/`optedOutAt` dropped on read until UI consumes them. `watchContactsDirect()` (panic flow) is a single REST GET wrapped as a Stream. Project-wide `flutter analyze` returns 0 errors — no Firebase imports remain in `lib/`. |
+| 8: PanicRepository → MyPanicApiClient (P0) | ✓ (this session, commit `0c79b2f`) | The load-bearing P0 (override #1). `sendEmergencyAlert` now `POST /api/v1/alerts` with `{latitude, longitude, locationAccuracyM, triggeredAt, clientIdempotencyKey: const Uuid().v4()}`; returns `AlertStatus` parsed from the 202 (`alertId`, `triggeredAt`, status mapped to `AlertState`). `cancelAlert` now `POST /api/v1/alerts/{id}/cancel` (204 → true; ApiException → false). **`sendSmsToContacts` deleted entirely** — backend owns SMS dispatch via SMSFlow + FanOutAlertJob. `panic_notifier._activateAlert` no longer reads contacts/medical_profile and no longer launches an `sms:` URL intent. Analyzer clean. |
 
-## What's next (Tasks 7–10 per addendum renumbering)
+## What's next (Tasks 9–12 per addendum renumbering)
 
 Same as previous session's resume doc but with these adjustments learned this session:
 
@@ -60,10 +62,10 @@ Same as previous session's resume doc but with these adjustments learned this se
 
 | New # | Brief |
 |-------|-------|
-| 7 | `ContactsRepository` + `SyncService` REST-backed. Override #13 race fixes: `_syncLock` Completer; flush-then-sync ordering on connectivity restore; merge-not-replace when `hasPendingChanges()`. **Note:** the API contact DTO shape will likely need the same kind of adapter layer Task 6 introduced — check `EmergencyContact` (Flutter) vs `ContactResponse`/`UpsertContactRequest` (API) for field-name and type drift before mapping. |
-| 8 (NEW, P0) | **PanicRepository → MyPanicApiClient.** `sendEmergencyAlert` becomes `await _api.post('/api/v1/alerts', {...})`. Generate `clientIdempotencyKey = const Uuid().v4()`. Drop `sendSmsToContacts`. Update `panic_notifier.dart`. |
-| 9 (NEW) | **xUnit-equivalent Flutter test project.** Add `mocktail` to dev_dependencies. Cover all 15 paths from the coverage diagram. **CRITICAL** test: `MyPanicApiClient` 401-retry. |
-| 10 | End-to-end smoke test on real Huawei device. |
+| 9 (NEW) | **xUnit-equivalent Flutter test project.** Add `mocktail` to dev_dependencies. Cover all 15 paths from the coverage diagram in the plan addendum (lines 78–99). **CRITICAL** test: `MyPanicApiClient` 401-retry-then-refresh-then-success. Other high-value targets: AuthRepository auth-state error swallowing, sign-in/sign-up state flow, bearer-attachment, ApiException 4xx mapping, 204→null, SyncService merge-on-pending + flush-then-sync ordering, UserProfileRepository 404→null + watch poll/auto-cancel, PanicRepository payload + UUID idempotency key, AuthLinkHandler `getSessionFromUrl` invocation. |
+| 10 | Final import sweep + README update. Replace `flutter run` instructions with the three `--dart-define` form (SUPABASE_URL, SUPABASE_ANON_KEY, MYPANIC_API_BASE_URL). Drop the `google-services.json` line. Verify `grep -rn "firebase_auth\|firebase_core\|cloud_firestore\|google-services" lib/` returns nothing (current state: only the doc-comment in `app_user.dart`). |
+| 11 | End-to-end smoke test on real Huawei device. Manual. Backend running on dev-machine LAN IP, `MYPANIC_API_BASE_URL=http://<LAN-IP>:5187`. Confirm panic button → 202 from `MyPanic.Api` → SMS arrives via SMSFlow sandbox; password-reset deep-link round-trip; signup → email verify → onboarding. |
+| 12 (NEW) | Tag and release the Flutter app (e.g., `v0.1.0-supabase-migration`). |
 
 ## Discipline used this session
 
