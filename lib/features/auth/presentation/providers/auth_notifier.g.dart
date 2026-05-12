@@ -132,3 +132,97 @@ abstract class _$SignupAwaitingConfirmation extends $Notifier<bool> {
     element.handleCreate(ref, build);
   }
 }
+
+/// Tracks the transient "password recovery in progress" state.
+///
+/// Set by [AuthLinkHandler] when it detects a `type=recovery` deep link, BEFORE
+/// it calls `getSessionFromUrl`. The router watches this flag and force-routes
+/// to `/reset-password` even though Supabase will report the user as logged in
+/// — the recovery session is special-purpose (only authorizes `updateUser`),
+/// so we should not let the user wander into the rest of the app.
+///
+/// Cleared by `/reset-password` after a successful update + signOut, or after
+/// [_window] elapses if the user abandons the flow.
+
+@ProviderFor(PasswordRecovery)
+final passwordRecoveryProvider = PasswordRecoveryProvider._();
+
+/// Tracks the transient "password recovery in progress" state.
+///
+/// Set by [AuthLinkHandler] when it detects a `type=recovery` deep link, BEFORE
+/// it calls `getSessionFromUrl`. The router watches this flag and force-routes
+/// to `/reset-password` even though Supabase will report the user as logged in
+/// — the recovery session is special-purpose (only authorizes `updateUser`),
+/// so we should not let the user wander into the rest of the app.
+///
+/// Cleared by `/reset-password` after a successful update + signOut, or after
+/// [_window] elapses if the user abandons the flow.
+final class PasswordRecoveryProvider
+    extends $NotifierProvider<PasswordRecovery, bool> {
+  /// Tracks the transient "password recovery in progress" state.
+  ///
+  /// Set by [AuthLinkHandler] when it detects a `type=recovery` deep link, BEFORE
+  /// it calls `getSessionFromUrl`. The router watches this flag and force-routes
+  /// to `/reset-password` even though Supabase will report the user as logged in
+  /// — the recovery session is special-purpose (only authorizes `updateUser`),
+  /// so we should not let the user wander into the rest of the app.
+  ///
+  /// Cleared by `/reset-password` after a successful update + signOut, or after
+  /// [_window] elapses if the user abandons the flow.
+  PasswordRecoveryProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'passwordRecoveryProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$passwordRecoveryHash();
+
+  @$internal
+  @override
+  PasswordRecovery create() => PasswordRecovery();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(bool value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<bool>(value),
+    );
+  }
+}
+
+String _$passwordRecoveryHash() => r'f3f0a1249edaf20f918f8a9f79de742418e86d83';
+
+/// Tracks the transient "password recovery in progress" state.
+///
+/// Set by [AuthLinkHandler] when it detects a `type=recovery` deep link, BEFORE
+/// it calls `getSessionFromUrl`. The router watches this flag and force-routes
+/// to `/reset-password` even though Supabase will report the user as logged in
+/// — the recovery session is special-purpose (only authorizes `updateUser`),
+/// so we should not let the user wander into the rest of the app.
+///
+/// Cleared by `/reset-password` after a successful update + signOut, or after
+/// [_window] elapses if the user abandons the flow.
+
+abstract class _$PasswordRecovery extends $Notifier<bool> {
+  bool build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<bool, bool>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<bool, bool>,
+              bool,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}

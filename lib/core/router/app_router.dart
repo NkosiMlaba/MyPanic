@@ -13,6 +13,7 @@ import 'package:my_panic/features/auth/presentation/screens/login_screen.dart';
 import 'package:my_panic/features/auth/presentation/screens/signup_screen.dart';
 import 'package:my_panic/features/auth/presentation/screens/forgot_password_screen.dart';
 import 'package:my_panic/features/auth/presentation/screens/change_password_screen.dart';
+import 'package:my_panic/features/auth/presentation/screens/reset_password_screen.dart';
 import 'package:my_panic/features/auth/presentation/screens/verify_email_screen.dart';
 import 'package:my_panic/features/panic/presentation/providers/panic_notifier.dart';
 import 'package:my_panic/features/panic/presentation/screens/home_screen.dart';
@@ -35,6 +36,7 @@ class AppRoutes {
   static const String login = '/login';
   static const String signup = '/signup';
   static const String forgotPassword = '/forgot-password';
+  static const String resetPassword = '/reset-password';
   static const String verifyEmail = '/verify-email';
   static const String onboarding = '/onboarding';
   static const String settings = '/settings';
@@ -53,6 +55,11 @@ GoRouter goRouter(Ref ref) {
   // Transient flag set after signUp when Supabase returns a null session
   // because email confirmation is enabled.
   final awaitingConfirmation = ref.watch(signupAwaitingConfirmationProvider);
+  // Transient flag set by AuthLinkHandler when a `type=recovery` deep link
+  // lands. The user is now signed in via a recovery-only session that
+  // ONLY authorizes updateUser — we must keep them on /reset-password
+  // until they pick a new password (or the flag expires).
+  final inPasswordRecovery = ref.watch(passwordRecoveryProvider);
   // Watch user profile state
   final userProfileState = ref.watch(userProfileProvider);
   // Watch panic state for panic flow redirects
@@ -77,8 +84,18 @@ GoRouter goRouter(Ref ref) {
       final isLoginRoute = currentPath == AppRoutes.login;
       final isSignUpRoute = currentPath == AppRoutes.signup;
       final isForgotPasswordRoute = currentPath == AppRoutes.forgotPassword;
+      final isResetPasswordRoute = currentPath == AppRoutes.resetPassword;
       final isVerifyEmailRoute = currentPath == AppRoutes.verifyEmail;
       final isOnboardingRoute = currentPath == AppRoutes.onboarding;
+
+      // 0. Password-recovery short-circuit. Runs BEFORE every other gate so
+      // it wins over the "logged in → home" rule below: the recovery session
+      // makes Supabase report isLoggedIn=true, but the only safe action is
+      // updateUser. The screen calls signOut + clears the flag on success,
+      // which collapses this branch back to the normal logged-out flow.
+      if (inPasswordRecovery) {
+        return isResetPasswordRoute ? null : AppRoutes.resetPassword;
+      }
 
       final isAuthRoute =
           isLoginRoute || isSignUpRoute || isForgotPasswordRoute;
@@ -178,6 +195,10 @@ GoRouter goRouter(Ref ref) {
       GoRoute(
         path: AppRoutes.forgotPassword,
         builder: (context, state) => const ForgotPasswordScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.resetPassword,
+        builder: (context, state) => const ResetPasswordScreen(),
       ),
       GoRoute(
         path: AppRoutes.verifyEmail,

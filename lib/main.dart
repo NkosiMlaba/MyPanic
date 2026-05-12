@@ -14,6 +14,7 @@ import 'package:my_panic/core/theme/app_theme.dart';
 import 'package:my_panic/core/router/app_router.dart';
 
 import 'package:my_panic/core/utils/riverpod_logger.dart';
+import 'package:my_panic/features/auth/presentation/providers/auth_notifier.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,10 +43,20 @@ void main() async {
     }
   }
 
+  // Build the Riverpod container before runApp so we can wire the
+  // AuthLinkHandler's recovery callback into PasswordRecovery.mark().
+  // The same container is passed to ProviderScope below via `parent`, so
+  // every read/watch resolves through this one container — no risk of
+  // two containers and providers initialised twice.
+  _container = ProviderContainer(observers: [RiverpodLogger()]);
+
   // Override #14 / Task 4d: handle PKCE deep-links (password-reset,
   // email-confirmation). The handler must outlive any one screen, so we
   // hold the reference on a long-lived top-level field.
-  _authLinkHandler = AuthLinkHandler()..start();
+  _authLinkHandler = AuthLinkHandler(
+    onRecoveryDetected: () =>
+        _container!.read(passwordRecoveryProvider.notifier).mark(),
+  )..start();
 
   // Lock to portrait mode for consistent UX
   SystemChrome.setPreferredOrientations([
@@ -64,13 +75,22 @@ void main() async {
   );
 
   runApp(
-    ProviderScope(observers: [RiverpodLogger()], child: const MyPanicApp()),
+    UncontrolledProviderScope(
+      container: _container!,
+      child: const MyPanicApp(),
+    ),
   );
 }
 
 // Holds the lifetime-of-app deep-link subscription so it isn't GC'd.
 // ignore: unused_element
 AuthLinkHandler? _authLinkHandler;
+
+// Same lifetime as _authLinkHandler. Built before runApp so the handler
+// can read the PasswordRecovery notifier through it; passed into the
+// widget tree via UncontrolledProviderScope so the rest of the app
+// resolves providers through the same container.
+ProviderContainer? _container;
 
 /// Main application widget.
 class MyPanicApp extends ConsumerWidget {
