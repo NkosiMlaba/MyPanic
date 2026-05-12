@@ -53,13 +53,28 @@ class AuthRepository {
     String email,
     String password,
   ) async {
-    await _client.auth.signUp(email: email, password: password);
+    // emailRedirectTo: same deep-link as password reset so the verification
+    // link round-trips through the AndroidManifest intent-filter back into
+    // the app via AuthLinkHandler.
+    await _client.auth.signUp(
+      email: email,
+      password: password,
+      emailRedirectTo: 'io.kizuri.mypanic://auth-callback',
+    );
   }
 
-  /// Supabase emails the reset link. The redirect URL is configured in
-  /// Supabase Studio → Authentication → URL Configuration.
+  /// Supabase emails the reset link. We pass `redirectTo` explicitly so the
+  /// link round-trips through the AndroidManifest intent-filter back into the
+  /// app via AuthLinkHandler. Without this, Supabase falls back to the
+  /// project's Site URL (the unconfigured default `http://localhost:3000`)
+  /// and the link opens in the browser instead of the app. The same scheme
+  /// must be in Supabase Studio → Authentication → URL Configuration →
+  /// Redirect URLs allowlist.
   Future<void> sendPasswordResetEmail(String email) async {
-    await _client.auth.resetPasswordForEmail(email);
+    await _client.auth.resetPasswordForEmail(
+      email,
+      redirectTo: 'io.kizuri.mypanic://auth-callback',
+    );
   }
 
   Future<void> signOut() async {
@@ -82,7 +97,11 @@ class AuthRepository {
 
   /// Resend the signup confirmation email. Used by verify_email_screen.
   Future<void> resendSignupConfirmation(String email) async {
-    await _client.auth.resend(type: OtpType.signup, email: email);
+    await _client.auth.resend(
+      type: OtpType.signup,
+      email: email,
+      emailRedirectTo: 'io.kizuri.mypanic://auth-callback',
+    );
   }
 
   /// Refresh the session; useful while polling for email verification.

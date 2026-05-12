@@ -88,6 +88,7 @@ void main() {
         when(() => auth.signUp(
               email: any(named: 'email'),
               password: any(named: 'password'),
+              emailRedirectTo: any(named: 'emailRedirectTo'),
             )).thenAnswer((_) async => _MockAuthResponse());
         when(() => auth.currentUser).thenReturn(null);
 
