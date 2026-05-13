@@ -25,6 +25,7 @@ import 'package:my_panic/features/user_profile/presentation/screens/onboarding_s
 import 'package:my_panic/features/user_profile/presentation/screens/settings_screen.dart';
 import 'package:my_panic/features/user_profile/presentation/screens/contacts_screen.dart';
 import 'package:my_panic/features/user_profile/presentation/screens/edit_profile_screen.dart';
+import 'package:my_panic/features/keychain/presentation/screens/keychain_pairing_screen.dart';
 
 import 'package:my_panic/core/utils/router_logger.dart';
 
@@ -45,6 +46,7 @@ class AppRoutes {
   static const String changePassword = '/change-password';
   static const String countdown = '/countdown';
   static const String alertActive = '/alert-active';
+  static const String pairKeychain = '/pair-keychain';
 }
 
 /// Provides the GoRouter instance.
@@ -223,6 +225,10 @@ GoRouter goRouter(Ref ref) {
       GoRoute(
         path: AppRoutes.contacts,
         builder: (context, state) => const ContactsScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.pairKeychain,
+        builder: (context, state) => const KeychainPairingScreen(),
       ),
       GoRoute(
         path: AppRoutes.editProfile,

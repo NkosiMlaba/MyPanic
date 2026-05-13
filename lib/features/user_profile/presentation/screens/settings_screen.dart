@@ -46,6 +46,13 @@ class SettingsScreen extends ConsumerWidget {
             subtitle: 'Manage who to notify',
             onTap: () => context.push(AppRoutes.contacts),
           ),
+          _buildSettingsTile(
+            context,
+            icon: Icons.bluetooth_outlined,
+            title: 'Pair Panic Keychain',
+            subtitle: 'Connect an ESP32 keychain for hands-free alerts',
+            onTap: () => context.push(AppRoutes.pairKeychain),
+          ),
           const SizedBox(height: 24),
           _buildSectionHeader('Safety'),
           Consumer(
