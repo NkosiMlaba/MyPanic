@@ -177,7 +177,7 @@ final class ActiveTriggerServiceProvider
 }
 
 String _$activeTriggerServiceHash() =>
-    r'8616c2d037c5d0b65d7bd70709d3bf9122e8e664';
+    r'2c7b5dd8e70584f9c8f603a37eca27f9992d9315';
 
 /// Provides the HapticService.
 

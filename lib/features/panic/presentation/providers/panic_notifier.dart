@@ -23,6 +23,7 @@ import 'package:my_panic/features/trigger_engine/shake_trigger_service.dart';
 import 'package:my_panic/features/trigger_engine/qs_tile_trigger_service.dart';
 import 'package:my_panic/features/trigger_engine/widget_trigger_service.dart';
 import 'package:my_panic/features/trigger_engine/trigger_settings_provider.dart';
+import 'package:my_panic/features/keychain/data/ble_panic_trigger_service.dart';
 
 part 'panic_notifier.g.dart';
 
@@ -75,6 +76,11 @@ PanicTriggerService activeTriggerService(Ref ref) {
   if (Platform.isAndroid) {
     sources.add(WidgetTriggerService(bridge));
   }
+
+  // BLE keychain trigger. Always included — the service handles
+  // "no paired devices yet" internally (its 30s poll will pick up new
+  // pairings, and a no-paired-devices state is just no-op).
+  sources.add(ref.watch(blePanicTriggerServiceProvider));
 
   final composite = CompositeTriggerService(sources);
   composite.armSystem(); // Arm all sources so native services start
