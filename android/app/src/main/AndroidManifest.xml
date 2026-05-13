@@ -124,11 +124,26 @@
         </intent>
     </queries>
 
+    <!-- BLE capability — declared but not required, so the APK installs
+         on phones without BLE. -->
+    <uses-feature android:name="android.hardware.bluetooth_le" android:required="false" />
+
     <!-- Required for all builds (debug, profile, release). The debug manifest
          used to declare this on its own for hot-reload, but release builds were
          shipping without it and failing every Supabase / API HTTPS call with
          `Failed host lookup: ... errno = 7`. -->
     <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- BLE central role for the MyPanic keychain. Android 12+ uses the
+         new BLUETOOTH_SCAN / BLUETOOTH_CONNECT runtime permissions; older
+         versions need the legacy BLUETOOTH + BLUETOOTH_ADMIN. -->
+    <uses-permission android:name="android.permission.BLUETOOTH"
+                     android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"
+                     android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN"
+                     android:usesPermissionFlags="neverForLocation" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />

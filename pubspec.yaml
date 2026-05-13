@@ -67,6 +67,9 @@ dependencies:
   http: ^1.6.0
   app_links: ^6.3.2
 
+  # BLE central for the panic keychain.
+  flutter_blue_plus: ^1.32.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
